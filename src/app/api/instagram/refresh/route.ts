@@ -9,6 +9,10 @@ import { getSupabaseService } from '@/lib/supabase';
 export async function GET() {
     const supabase = getSupabaseService();
 
+    if (!supabase) {
+        return NextResponse.json({ error: 'Supabase client not initialized. Check environment variables.' }, { status: 500 });
+    }
+
     try {
         // 1. Get the current token from Supabase
         const { data: config, error: fetchError } = await supabase

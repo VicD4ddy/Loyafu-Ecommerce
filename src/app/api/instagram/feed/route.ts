@@ -8,21 +8,30 @@ import { supabase } from '@/lib/supabase';
 export async function GET() {
     try {
         // 1. Get the current token from Supabase
-        const { data: config, error: fetchError } = await supabase
-            .from('store_config')
-            .select('value')
-            .eq('key', 'instagram_token')
-            .single();
+        let token: string | null = null;
 
-        if (fetchError || !config) {
-            console.warn('Instagram token not found in DB, falling back to ENV');
-            // Potential fallback if DB is not ready
-            const envToken = process.env.NEXT_PUBLIC_INSTAGRAM_TOKEN;
-            if (!envToken) return NextResponse.json({ data: [] });
-            return fetchInstagramData(envToken);
+        if (supabase) {
+            const { data: config, error: fetchError } = await supabase
+                .from('store_config')
+                .select('value')
+                .eq('key', 'instagram_token')
+                .single();
+
+            if (!fetchError && config) {
+                token = config.value;
+            }
         }
 
-        return fetchInstagramData(config.value);
+        if (!token) {
+            console.warn('Instagram token not found in DB or Supabase not initialized, falling back to ENV');
+            token = process.env.NEXT_PUBLIC_INSTAGRAM_TOKEN || null;
+        }
+
+        if (!token) {
+            return NextResponse.json({ data: [] });
+        }
+
+        return fetchInstagramData(token);
 
     } catch (error: any) {
         console.error('Instagram feed route error:', error);
