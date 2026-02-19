@@ -76,7 +76,7 @@ export default function Home() {
                 key={`${cat}-${i}`}
                 className="flex-shrink-0 text-2xl md:text-5xl font-black text-primary/40 uppercase italic font-brand tracking-widest"
               >
-                {cat}
+                {cat === 'Otros' ? 'y mucho más' : cat}
               </span>
             ))}
           </div>
