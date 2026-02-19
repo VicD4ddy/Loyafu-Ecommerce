@@ -1,47 +1,75 @@
 "use client";
 
-import { Sparkles, Star, Zap } from 'lucide-react';
+import { Sparkles, Star, Zap, Send } from 'lucide-react';
 
 export default function Newsletter() {
     return (
-        <section className="px-6 max-w-7xl mx-auto pb-24">
-            <div className="bg-primary rounded-3xl p-8 md:p-16 text-center text-white relative overflow-hidden">
-                {/* Decorative elements */}
-                <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-                <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+        <section className="px-4 md:px-6 max-w-7xl mx-auto pb-16 md:pb-24">
+            <div className="bg-background-dark rounded-[2.5rem] p-8 md:p-16 text-center text-white relative overflow-hidden border border-white/5 shadow-2xl">
+                {/* Background Decorations */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none select-none overflow-hidden">
+                    <span className="absolute top-10 -left-10 text-[120px] font-brand font-black italic whitespace-nowrap rotate-12">
+                        LOYAFU BEAUTY LOYAFU BEAUTY
+                    </span>
+                    <span className="absolute bottom-10 -right-10 text-[120px] font-brand font-black italic whitespace-nowrap -rotate-12">
+                        TU MEJOR VERSION TU MEJOR VERSION
+                    </span>
+                </div>
 
-                <div className="relative z-10 space-y-8">
-                    <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase font-brand">Únete al Club Loyafu</h2>
-                    <p className="text-white/80 max-w-md mx-auto font-medium text-lg">
-                        Obtén 15% de descuento en tu primera orden, acceso exclusivo y tips de cuidado de la piel.
-                    </p>
+                {/* Glass Blur Circles */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+
+                <div className="relative z-10 space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+                    <div className="space-y-4">
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-black text-[10px] uppercase tracking-[0.3em]">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
+                            Comunidad Exclusiva
+                        </span>
+                        <h2 className="text-4xl md:text-7xl font-black tracking-tighter leading-[0.9] uppercase font-brand italic">
+                            ÚNETE AL <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">CLUB LOYAFU</span>
+                        </h2>
+                        <p className="text-white/60 max-w-md mx-auto font-medium text-base md:text-lg">
+                            Obtén <span className="text-white font-bold">15% de descuento</span> en tu primera orden, acceso anticipado y tips de expertos.
+                        </p>
+                    </div>
 
                     <form
-                        className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto"
-                        onSubmit={(e) => { e.preventDefault(); alert("Thanks for joining!"); }}
+                        className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto relative group"
+                        onSubmit={(e) => { e.preventDefault(); alert("¡Bienvenida al club! ✨"); }}
                     >
-                        <input
-                            className="flex-1 rounded-full px-8 py-4 text-background-dark border-none focus:ring-4 focus:ring-white/30 text-lg font-bold placeholder:text-gray-400"
-                            placeholder="Tu mejor email..."
-                            type="email"
-                        />
-                        <button type="submit" className="bg-background-dark text-white px-8 py-4 rounded-full font-black uppercase text-sm tracking-widest hover:scale-105 transition-transform hover:shadow-lg">
-                            Unirme
+                        <div className="relative flex-1">
+                            <input
+                                className="w-full rounded-2xl px-6 py-4 bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-primary/50 text-lg font-medium placeholder:text-white/20 transition-all outline-none"
+                                placeholder="Tu mejor email..."
+                                type="email"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="bg-white text-background-dark px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-primary hover:text-white transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-xl">
+                            UNIRME
+                            <Send className="w-3.5 h-3.5" />
                         </button>
                     </form>
 
-                    <div className="flex items-center justify-center gap-8 pt-8 opacity-60">
-                        <div className="flex flex-col items-center gap-1">
-                            <Sparkles className="w-8 h-8" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Cruelty Free</span>
+                    <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 pt-10 border-t border-white/5">
+                        <div className="flex flex-col items-center gap-2 group cursor-default">
+                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                <Sparkles className="w-6 h-6 text-primary" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white/60 transition-colors">Cruelty Free</span>
                         </div>
-                        <div className="flex flex-col items-center gap-1">
-                            <Star className="w-8 h-8" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Vegano</span>
+                        <div className="flex flex-col items-center gap-2 group cursor-default">
+                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                <Star className="w-6 h-6 text-primary" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white/60 transition-colors">Vegano</span>
                         </div>
-                        <div className="flex flex-col items-center gap-1">
-                            <Zap className="w-8 h-8" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Reciclable</span>
+                        <div className="flex flex-col items-center gap-2 group cursor-default">
+                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                <Zap className="w-6 h-6 text-primary" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white/60 transition-colors">Reciclable</span>
                         </div>
                     </div>
                 </div>

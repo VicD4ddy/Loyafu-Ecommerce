@@ -105,18 +105,42 @@ export default function Navbar() {
                 scrolled ? "top-4" : "top-0"
             )}>
                 <div className={cn(
-                    "mx-auto transition-all duration-500 ease-in-out flex items-center justify-between",
+                    "relative mx-auto transition-all duration-500 ease-in-out flex items-center justify-between",
                     scrolled
                         ? "w-[95%] max-w-5xl bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-full shadow-2xl shadow-primary/10 border border-primary/20 px-3 md:px-6 py-1.5 md:py-1"
                         : "w-full max-w-7xl px-4 md:px-6 py-2 bg-transparent"
                 )}>
+                    {/* High-End Glow Line (on scroll) */}
+                    {scrolled && (
+                        <div className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent animate-in fade-in zoom-in duration-1000" />
+                    )}
+
+                    {/* Mobile: Left Action (Search) */}
+                    <div className="md:hidden flex items-center">
+                        <button
+                            className={cn(
+                                "p-2 rounded-full hover:bg-primary/5 text-primary transition-all",
+                                isOpen && "opacity-0 pointer-events-none"
+                            )}
+                            onClick={() => setIsSearchOpen(!isSearchOpen)}
+                        >
+                            <Search className="w-5 h-5" />
+                        </button>
+                    </div>
 
                     {/* Logo Section */}
-                    <div className="flex items-center gap-8">
+                    {/* Logo Section - Centered on Mobile, Left on Desktop */}
+                    <div className={cn(
+                        "flex items-center gap-8",
+                        "absolute left-1/2 -translate-x-1/2 md:relative md:left-0 md:translate-x-0"
+                    )}>
                         <Link href="/" className="flex items-center gap-2 group">
-                            {/* Replaced Text Logo with Image Logo */}
                             <div className={cn(
-                                "relative w-36 h-12 md:w-64 md:h-20 transition-transform duration-300 group-hover:scale-105",
+                                "relative transition-all duration-500",
+                                scrolled
+                                    ? "w-28 h-8 md:w-56 md:h-16"
+                                    : "w-36 h-12 md:w-64 md:h-20",
+                                "group-hover:scale-105"
                             )}>
                                 <Image
                                     src="/assets/brand/logo-main.png"
@@ -153,24 +177,9 @@ export default function Navbar() {
                         </div>
                     </div>
 
-                    {/* Mobile Menu Open - Brand Tagline (fills empty space) */}
-                    {isOpen && (
-                        <div className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 animate-in fade-in duration-500">
-                            <Sparkles className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-xs font-bold text-primary/60 tracking-widest uppercase whitespace-nowrap">Glow Up</span>
-                        </div>
-                    )}
+                    {/* Actions Section - Desktop */}
+                    <div className="hidden md:flex items-center gap-1.5 sm:gap-3">
 
-                    {/* Actions Section */}
-                    <div className="flex items-center gap-1.5 sm:gap-3">
-
-                        {/* BCV Rate Badge */}
-                        {bcvRate && (
-                            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold text-xs shadow-sm animate-in fade-in duration-700">
-                                <RefreshCw className="w-3 h-3" />
-                                <span>BCV: {bcvRate.toFixed(2)} Bs</span>
-                            </div>
-                        )}
 
                         {/* Search Bar - Desktop */}
                         <div className={cn(
@@ -186,24 +195,12 @@ export default function Navbar() {
                             />
                         </div>
 
-                        {/* Mobile Search Toggle */}
-                        <button
-                            className={cn(
-                                "sm:hidden p-2 rounded-full bg-white/70 backdrop-blur-sm border border-primary/10 shadow-sm hover:bg-primary/10 text-primary transition-all",
-                                isOpen && "opacity-0 pointer-events-none"
-                            )}
-                            onClick={() => setIsSearchOpen(!isSearchOpen)}
-                        >
-                            <Search className="w-4 h-4" />
-                        </button>
-
-                        {/* Favorites Button with Animation */}
+                        {/* Favorites Button (Desktop) */}
                         <Link
                             href="/favorites"
                             className={cn(
                                 "relative bg-white/70 backdrop-blur-sm p-2 sm:p-2.5 rounded-full border border-primary/10 shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all text-background-dark group",
-                                favAnimate && "animate-bounce",
-                                isOpen && "opacity-0 pointer-events-none"
+                                favAnimate && "animate-bounce"
                             )}
                         >
                             <Heart className={cn("w-4 h-4 sm:w-5 sm:h-5 group-hover:fill-current transition-all", favCount > 0 ? "text-red-500 fill-current" : "")} />
@@ -214,20 +211,14 @@ export default function Navbar() {
                             )}
                         </Link>
 
-                        {/* Cart Button with Animation */}
+                        {/* Cart Button (Desktop) */}
                         <Link
                             href="/cart"
                             className={cn(
                                 "relative bg-white/70 backdrop-blur-sm p-2 sm:p-2.5 rounded-full border border-primary/10 shadow-sm hover:bg-primary/20 hover:border-primary/30 transition-all text-background-dark group",
-                                cartAnimate && "animate-bounce",
-                                isOpen && "opacity-0 pointer-events-none"
+                                cartAnimate && "animate-bounce"
                             )}
                         >
-                            {/* Micro-interaction Sticker */}
-                            <div className="absolute -top-6 -right-4 w-10 h-10 pointer-events-none hidden group-hover:block animate-in fade-in zoom-in duration-300">
-                                <Image src="/assets/brand/sticker-03.png" alt="Yaaas" width={40} height={40} className="object-contain rotate-12" />
-                            </div>
-
                             <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 group-hover:text-primary transition-colors" />
                             {cartCount > 0 && (
                                 <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-primary text-[9px] sm:text-[10px] font-bold text-white border-2 border-white shadow-sm">
@@ -235,13 +226,18 @@ export default function Navbar() {
                                 </span>
                             )}
                         </Link>
+                    </div>
 
-                        {/* Mobile Menu Toggle */}
+                    {/* Mobile Menu Toggle (Already handled by the previous step, but let's ensure it's inside the flex container) */}
+                    <div className="md:hidden flex items-center">
                         <button
-                            className="md:hidden bg-white/70 backdrop-blur-sm p-2 rounded-full border border-primary/10 shadow-sm hover:bg-primary/20 hover:border-primary/30 transition-all text-background-dark"
+                            className={cn(
+                                "p-2 rounded-full hover:bg-primary/5 transition-all text-background-dark",
+                                isOpen && "text-primary"
+                            )}
                             onClick={() => setIsOpen(!isOpen)}
                         >
-                            {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
                     </div>
                 </div>
@@ -264,82 +260,71 @@ export default function Navbar() {
                         </div>
                     </div>
                 )}
-            </nav >
+            </nav>
 
-            {/* Mobile Menu Overlay */}
-            {
-                isOpen && (
-                    <div className="fixed inset-0 z-30 bg-background-light/95 backdrop-blur-2xl pt-20 px-6 md:hidden animate-in fade-in slide-in-from-top-10 duration-300 flex flex-col">
-                        {/* Background Pattern */}
-                        <div className="absolute inset-0 z-[-1] opacity-[0.07] pointer-events-none">
-                            <Image src="/assets/brand/pattern.jpg" alt="pattern" fill className="object-cover" />
-                        </div>
+            {/* Mobile Menu Dropdown - Premium Glassmorphic */}
+            <div className={cn(
+                "fixed left-1/2 -translate-x-1/2 top-20 z-50 w-[92%] max-w-sm md:hidden transition-all duration-500 ease-out origin-top",
+                isOpen
+                    ? "opacity-100 scale-100 pointer-events-auto"
+                    : "opacity-0 scale-95 pointer-events-none -translate-y-4"
+            )}>
+                <div className="bg-white/90 backdrop-blur-2xl border border-primary/20 rounded-[2.5rem] shadow-2xl shadow-primary/20 overflow-hidden relative">
+                    {/* Pattern Background */}
+                    <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
+                        <Image src="/assets/brand/pattern.jpg" alt="" fill className="object-cover" />
+                    </div>
 
-                        {/* Decorative accent line */}
-                        <div className="absolute top-16 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-
-                        <div className="space-y-5 flex-1 overflow-y-auto flex flex-col justify-center items-center pb-8">
-                            {/* Navigation Links */}
+                    <div className="relative z-10 p-6 space-y-4">
+                        {/* Navigation Links Grid */}
+                        <div className="grid grid-cols-2 gap-3">
                             {[
-                                { href: '/catalog?sort=new', label: 'NOVEDADES', icon: <Sparkles className="w-5 h-5" /> },
-                                { href: '/catalog', label: 'TIENDA', icon: <ShoppingBag className="w-5 h-5" /> },
-                                { href: '/favorites', label: 'FAVORITOS', icon: <Heart className="w-5 h-5" /> },
-                                { href: '/#promociones', label: 'PROMOS', icon: <ArrowRight className="w-5 h-5" /> },
+                                { href: '/catalog?sort=new', label: 'Novedades', icon: <Sparkles className="w-5 h-5" />, color: "bg-purple-50 text-purple-600" },
+                                { href: '/catalog', label: 'Tienda', icon: <ShoppingBag className="w-5 h-5" />, color: "bg-primary/10 text-primary" },
+                                { href: '/favorites', label: 'Favoritos', icon: <Heart className="w-5 h-5" />, color: "bg-red-50 text-red-500", count: favCount },
+                                { href: '/#promociones', label: 'Promos', icon: <ArrowRight className="w-5 h-5" />, color: "bg-amber-50 text-amber-600" },
                             ].map((item, i) => (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        "relative group flex items-center gap-3 text-3xl sm:text-4xl font-black font-brand transition-all duration-300 hover:scale-105",
-                                        isActive(item.href)
-                                            ? "text-primary"
-                                            : "text-background-dark hover:text-primary"
+                                        "flex flex-col items-center justify-center gap-3 p-5 rounded-3xl transition-all duration-300 active:scale-95 group border border-transparent shadow-sm",
+                                        isActive(item.href) ? "bg-white border-primary/20 shadow-lg" : "bg-white/50 hover:bg-white hover:shadow-md"
                                     )}
-                                    style={{ animationDelay: `${i * 50}ms` }}
                                 >
-                                    {/* Active indicator dot */}
-                                    {isActive(item.href) && (
-                                        <span className="absolute -left-6 w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/50" />
-                                    )}
-                                    <span className="relative z-10">{item.label}</span>
-                                    {/* Fav count badge inline */}
-                                    {item.href === '/favorites' && favCount > 0 && (
-                                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-red-500 text-white text-xs font-sans font-bold shadow-lg">
-                                            {favCount}
-                                        </span>
-                                    )}
-                                    {/* Underline effect on hover */}
-                                    <span className="absolute -bottom-1 left-0 right-0 h-1 bg-primary/20 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                                    <div className={cn(
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 relative",
+                                        item.color
+                                    )}>
+                                        {item.icon}
+                                        {item.count !== undefined && item.count > 0 && (
+                                            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white shadow-sm">
+                                                {item.count}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-background-dark/80">{item.label}</span>
                                 </Link>
                             ))}
-
-                            {/* Mobile BCV Rate */}
-                            {bcvRate && (
-                                <div className="pt-6">
-                                    <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl font-bold text-sm shadow-sm">
-                                        <RefreshCw className="w-4 h-4" />
-                                        <span>Tasa BCV: {bcvRate.toFixed(2)} Bs</span>
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
-                        {/* Socials & Footer in Menu */}
-                        <div className="py-6 space-y-3 border-t border-primary/10">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] text-center">Síguenos</p>
-                            <div className="flex justify-center gap-4">
-                                <a href="https://instagram.com/loyafu.ve" target="_blank" className="w-11 h-11 rounded-full bg-white border border-primary/10 flex items-center justify-center text-primary shadow-md hover:shadow-lg hover:scale-110 hover:border-primary/30 transition-all">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+
+                        {/* Footer Socials */}
+                        <div className="pt-2 border-t border-primary/10 leading-none">
+                            <div className="flex items-center justify-center gap-6 py-4">
+                                <a href="https://instagram.com/loyafu.ve" target="_blank" className="text-slate-400 hover:text-primary transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
                                 </a>
-                                <a href="https://wa.me/584244096534" target="_blank" className="w-11 h-11 rounded-full bg-white border border-primary/10 flex items-center justify-center text-green-500 shadow-md hover:shadow-lg hover:scale-110 hover:border-green-300 transition-all">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16.95 7.05a10 10 0 0 0-14.1 0 10 10 0 0 0 .53 14.65L3 22l4.8-1.5a10 10 0 0 0 14.15-5.45" /></svg>
+                                <a href="https://wa.me/584244096534" target="_blank" className="text-slate-400 hover:text-green-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16.95 7.05a10 10 0 0 0-14.1 0 10 10 0 0 0 .53 14.65L3 22l4.8-1.5a10 10 0 0 0 14.15-5.45" /></svg>
                                 </a>
+                                <Link href="/faq" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">FAQ</Link>
                             </div>
                         </div>
                     </div>
-                )
-            }
+                </div>
+            </div>
         </>
     );
 }

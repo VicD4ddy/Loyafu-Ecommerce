@@ -33,9 +33,9 @@ function CatalogContent() {
 
     const toggleCategory = (category: string) => {
         if (selectedCategories.includes(category)) {
-            setSelectedCategories(selectedCategories.filter(c => c !== category));
+            setSelectedCategories([]);
         } else {
-            setSelectedCategories([...selectedCategories, category]);
+            setSelectedCategories([category]);
         }
         setCurrentPage(1);
     };
@@ -113,39 +113,70 @@ function CatalogContent() {
     ];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-32 pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-28 pb-8">
 
             {/* Breadcrumbs & Hero */}
-            <div className="mb-4 md:mb-12 space-y-4">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl md:text-6xl font-black tracking-tighter mb-2 text-background-dark">Nuestro Catálogo</h1>
+            <div className="mb-4 md:mb-6 space-y-1.5">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-1">
+                    <h1 className="text-3xl md:text-6xl font-black tracking-tighter text-background-dark">Nuestro Catálogo</h1>
+                </div>
+
+                {/* Mobile Tools (Search & Horizontal Categories) */}
+                <div className="lg:hidden space-y-2">
+                    <form onSubmit={handleSearchSubmit} className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Buscar producto, marca..."
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-primary/15 rounded-xl text-sm font-bold placeholder:text-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all"
+                        />
+                        {searchTerm && (
+                            <button
+                                type="button"
+                                onClick={() => { setSearchTerm(''); router.push('/catalog'); }}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                    </form>
+
+                    {/* Horizontal Category Chips */}
+                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar -mx-4 px-4">
+                        <button
+                            onClick={() => setSelectedCategories([])}
+                            className={cn(
+                                "px-4 py-1.5 rounded-full font-bold text-[11px] whitespace-nowrap border transition-all shadow-sm",
+                                selectedCategories.length === 0
+                                    ? "bg-primary text-white border-primary"
+                                    : "bg-white border-primary/10 text-slate-600"
+                            )}
+                        >
+                            Todos
+                        </button>
+                        {CATEGORIES.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => toggleCategory(cat)}
+                                className={cn(
+                                    "px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap border transition-all shadow-sm",
+                                    selectedCategories.includes(cat)
+                                        ? "bg-primary text-white border-primary"
+                                        : "bg-white border-primary/10 text-slate-600"
+                                )}
+                            >
+                                {cat}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
-                {/* Mobile Search Bar — always visible */}
-                <form onSubmit={handleSearchSubmit} className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/40" />
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Buscar producto, marca..."
-                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-primary/15 rounded-2xl text-sm font-bold placeholder:text-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 shadow-sm transition-all"
-                    />
-                    {searchTerm && (
-                        <button
-                            type="button"
-                            onClick={() => { setSearchTerm(''); router.push('/catalog'); }}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    )}
-                </form>
-
                 {query && (
-                    <p className="text-sm font-bold text-primary/60">Resultados para: &ldquo;{query}&rdquo; ({sortedProducts.length})</p>
+                    <p className="text-sm font-bold text-primary/60 animate-in fade-in slide-in-from-left-4">
+                        Resultados para: &ldquo;{query}&rdquo; ({sortedProducts.length})
+                    </p>
                 )}
             </div>
 
@@ -174,84 +205,6 @@ function CatalogContent() {
                     </div>
                 </aside>
 
-                {/* Mobile Filter Toggle + Category Chips */}
-                <div className="lg:hidden space-y-3">
-                    <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                        <button
-                            onClick={() => setShowMobileFilters(!showMobileFilters)}
-                            className={cn(
-                                "flex items-center gap-2 px-5 py-2.5 border rounded-full font-bold shadow-sm whitespace-nowrap transition-all text-sm",
-                                showMobileFilters
-                                    ? "bg-primary text-white border-primary"
-                                    : "bg-white border-primary/20"
-                            )}
-                        >
-                            <SlidersHorizontal className="w-4 h-4" />
-                            Filtros
-                            {selectedCategories.length > 0 && (
-                                <span className="w-5 h-5 bg-white text-primary text-xs font-black rounded-full flex items-center justify-center">
-                                    {selectedCategories.length}
-                                </span>
-                            )}
-                        </button>
-
-                        {/* Sort on mobile */}
-                        <div className="relative">
-                            <select
-                                value={sortBy}
-                                onChange={(e) => { setSortBy(e.target.value as SortOption); setCurrentPage(1); }}
-                                className="appearance-none pl-9 pr-8 py-2.5 border border-primary/20 rounded-full font-bold text-sm bg-white shadow-sm whitespace-nowrap cursor-pointer"
-                            >
-                                {sortOptions.map(opt => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                ))}
-                            </select>
-                            <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50 pointer-events-none" />
-                        </div>
-
-                        {/* View Toggle */}
-                        <button
-                            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                            className="p-2.5 border border-primary/20 rounded-full bg-white shadow-sm hover:bg-primary/5 transition-all"
-                            aria-label="Cambiar vista"
-                        >
-                            {viewMode === 'grid' ? <List className="w-4 h-4 text-primary/60" /> : <LayoutGrid className="w-4 h-4 text-primary/60" />}
-                        </button>
-                    </div>
-
-                    {/* Mobile Filter Drawer */}
-                    {showMobileFilters && (
-                        <div className="bg-white rounded-2xl border border-primary/10 p-4 shadow-lg animate-in slide-in-from-top-4 duration-200">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-sm font-black uppercase tracking-widest text-primary/40">Categorías</h3>
-                                {selectedCategories.length > 0 && (
-                                    <button
-                                        onClick={() => { setSelectedCategories([]); setCurrentPage(1); }}
-                                        className="text-xs font-bold text-red-500 hover:text-red-700"
-                                    >
-                                        Limpiar
-                                    </button>
-                                )}
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {CATEGORIES.map((cat) => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => toggleCategory(cat)}
-                                        className={cn(
-                                            "px-4 py-2 border rounded-full font-bold text-xs transition-all",
-                                            selectedCategories.includes(cat)
-                                                ? "bg-primary text-white border-primary"
-                                                : "bg-white border-primary/10 text-slate-600 hover:border-primary/30"
-                                        )}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
 
                 {/* Product Grid Area */}
                 <div className="flex-1">
@@ -300,8 +253,8 @@ function CatalogContent() {
                     {paginatedProducts.length > 0 ? (
                         <div className={cn(
                             viewMode === 'grid'
-                                ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
-                                : "flex flex-col gap-4"
+                                ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6"
+                                : "flex flex-col gap-2"
                         )}>
                             {paginatedProducts.map((product, i) => (
                                 <ProductCard key={product.id} product={product} index={i} />

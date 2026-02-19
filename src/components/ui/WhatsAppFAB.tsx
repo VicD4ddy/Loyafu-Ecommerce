@@ -9,7 +9,7 @@ export default function WhatsAppFAB() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contactar por WhatsApp"
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/30 hover:scale-110 hover:shadow-xl hover:shadow-green-500/40 active:scale-95 transition-all group"
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] text-white rounded-full hidden md:flex items-center justify-center shadow-lg shadow-green-500/30 hover:scale-110 hover:shadow-xl hover:shadow-green-500/40 active:scale-95 transition-all group"
         >
             <MessageCircle className="w-7 h-7 group-hover:rotate-12 transition-transform" />
 

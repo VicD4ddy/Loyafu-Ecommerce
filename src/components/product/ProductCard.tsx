@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import { ShoppingCart, Heart, Sparkles, Percent, AlertCircle } from 'lucide-react';
+import { ShoppingCart, Heart, Sparkles, Percent, AlertCircle, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCartStore, Product } from '@/store/useCartStore';
 import { cn } from '@/lib/utils';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
@@ -37,9 +37,24 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
     const openModal = useProductModalStore((state) => state.openModal);
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const hasMultipleImages = product.images && product.images.length > 1;
+    const allImages = hasMultipleImages ? product.images! : [product.image];
+
+    const nextImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+    };
+
+    const prevImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    };
 
     const isFavorite = mounted ? isFavoriteFunc(product.id) : false;
 
@@ -78,10 +93,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     return (
         <div
             onClick={handleCardClick}
-            className="group relative bg-white rounded-2xl p-4 overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10 shadow-xl shadow-primary/5 border border-transparent hover:border-primary/5 cursor-pointer animate-fadeInUp"
+            onMouseEnter={() => hasMultipleImages && mounted && window.innerWidth > 768 && setCurrentImageIndex(1)}
+            onMouseLeave={() => hasMultipleImages && mounted && window.innerWidth > 768 && setCurrentImageIndex(0)}
+            className="group relative bg-white rounded-xl p-2.5 md:p-3 overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/10 shadow-xl shadow-primary/5 border border-transparent hover:border-primary/5 cursor-pointer animate-fadeInUp"
             style={{ animationDelay: `${index * 80}ms` }}
         >
-            <div className="relative aspect-[4/5] rounded-xl overflow-hidden mb-4 bg-gray-100">
+            <div className="relative aspect-[4/5] rounded-xl overflow-hidden mb-2 bg-gray-100">
                 {/* Badge */}
                 {badge && (
                     <span className={cn(
@@ -95,59 +112,107 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                         {badge === 'agotado' && <><AlertCircle className="w-3 h-3" /> Agotado</>}
                     </span>
                 )}
-                <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className={cn(
-                        "object-cover transition-transform duration-500",
-                        product.images && product.images.length > 1 ? "group-hover:opacity-0" : "group-hover:scale-110"
-                    )}
-                />
+                <div className="flex transition-transform duration-500 ease-out h-full w-full" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
+                    {allImages.map((img, idx) => (
+                        <div key={idx} className="relative flex-shrink-0 w-full h-full">
+                            <Image
+                                src={img}
+                                alt={`${product.name} ${idx + 1}`}
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+                    ))}
+                </div>
 
-                {product.images && product.images.length > 1 && (
-                    <Image
-                        src={product.images[1]}
-                        alt={`${product.name} view 2`}
-                        fill
-                        className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-105"
-                    />
+                {/* Multiple Images Indicators */}
+                {hasMultipleImages && (
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                        {allImages.map((_, idx) => (
+                            <div
+                                key={idx}
+                                className={cn(
+                                    "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                                    currentImageIndex === idx ? "bg-primary w-3" : "bg-primary/20"
+                                )}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Mobile Tap Arrows (Only visible if multiple images) */}
+                {hasMultipleImages && (
+                    <>
+                        <button
+                            onClick={prevImage}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity md:block hidden"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={nextImage}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity md:block hidden"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+
+                        {/* Invisible tap areas for mobile swipe simulation */}
+                        <div className="md:hidden absolute inset-y-0 left-0 w-1/3 z-10" onClick={prevImage} />
+                        <div className="md:hidden absolute inset-y-0 right-0 w-1/3 z-10" onClick={nextImage} />
+                    </>
                 )}
 
                 {/* Favorite Button */}
                 <button
                     onClick={handleToggleFavorite}
                     className={cn(
-                        "absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm z-10",
+                        "absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm z-20",
                         isFavorite ? "text-red-500 bg-red-50 hover:bg-red-100 ring-2 ring-red-100" : "text-primary/40 hover:text-primary hover:bg-white"
                     )}
                 >
                     <Heart className={cn("w-4 h-4 transition-transform active:scale-90", isFavorite && "fill-current")} />
                 </button>
 
-                {/* Quick Add Slide Up */}
-                <div className="absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-in-out z-20">
+                {/* Quick Add Button — Mobile Persistent / Desktop Hover */}
+                <div className="absolute bottom-3 right-3 z-30">
                     <button
                         onClick={handleAddToCart}
-                        className="w-full bg-primary text-white font-bold py-3 rounded-full shadow-lg shadow-primary/40 flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors"
+                        disabled={badge === 'agotado'}
+                        className={cn(
+                            "w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-90",
+                            badge === 'agotado'
+                                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                                : "bg-primary text-white hover:bg-primary-dark hover:scale-110 shadow-primary/30"
+                        )}
+                    >
+                        <Plus className="w-6 h-6" />
+                    </button>
+                </div>
+
+                {/* Desktop "Agregar" Bar (Still present for desktop hover feel) */}
+                <div className="hidden md:block absolute inset-x-4 bottom-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-in-out z-20">
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={badge === 'agotado'}
+                        className="w-full bg-primary/95 backdrop-blur-md text-white font-bold py-2.5 rounded-xl shadow-xl flex items-center justify-center gap-2 hover:bg-primary transition-colors"
                     >
                         <ShoppingCart className="w-4 h-4" />
-                        Agregar
+                        {badge === 'agotado' ? 'Agotado' : 'Agregar'}
                     </button>
                 </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0">
 
-                <h3 className="font-bold text-lg text-background-dark group-hover:text-primary transition-colors truncate">
+                <h3 className="font-bold text-base md:text-lg text-background-dark group-hover:text-primary transition-colors truncate">
                     {product.name}
                 </h3>
-                <p className="text-sm text-primary/60 font-medium">{product.category}</p>
-                <p className="text-[10px] text-slate-500 mt-1 line-clamp-2 italic">
+                <p className="text-[10px] md:text-sm text-primary/60 font-medium">{product.category}</p>
+                <p className="hidden md:block text-[10px] text-slate-500 mt-0.5 line-clamp-2 italic">
                     {getProductDescription(product)}
                 </p>
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center justify-between pt-0.5">
                     <div className="flex flex-col">
                         {product.priceUSD === 0 ? (
                             <span className="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-full">

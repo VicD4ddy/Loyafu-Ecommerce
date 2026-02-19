@@ -4,16 +4,20 @@ import { ArrowRight, Zap, ShoppingBag, MessageCircle, Banknote, Sparkles, Dollar
 import CombosSection from '@/components/home/CombosSection';
 import InstagramFeed from '@/components/home/InstagramFeed';
 import Testimonials from '@/components/home/Testimonials';
+import { PRODUCTS } from '@/data/products';
 
 
 
 export default function Home() {
+  // Extract unique categories, filter out empty ones, and normalize
+  const categories = Array.from(new Set(PRODUCTS.map(p => p.category))).filter(Boolean);
+
   return (
-    <div className="space-y-20">
+    <div className="space-y-8 md:space-y-20">
 
       {/* Hero Section */}
-      <section className="px-6 max-w-7xl mx-auto pt-24 md:pt-32">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 min-h-[600px] flex items-center p-8 md:p-16 shadow-2xl shadow-primary/10">
+      <section className="px-6 max-w-7xl mx-auto pt-6 md:pt-32">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 min-h-[400px] md:min-h-[600px] flex items-center p-4 md:p-16 shadow-2xl shadow-primary/10">
           {/* Abstract blobs */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
@@ -28,10 +32,10 @@ export default function Home() {
               {/* Hero Content */}
               <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000 text-center md:text-left">
                 <h1 className="text-5xl md:text-8xl font-black leading-[0.9] text-background-dark tracking-tighter font-brand">
-                  TU MEJOR VERSIÓN <span className="text-primary block md:inline">EMPIEZA HOY.</span>
+                  TU MEJOR VERSIÓN <span className="text-primary block md:inline">EMPIEZA HOY</span>
                 </h1>
                 <p className="text-lg text-background-dark/70 max-w-md font-medium mx-auto md:mx-0">
-                  Esenciales de belleza de alta energía para tu era de personaje principal. El look viral que estabas esperando.
+                  Lleva los productos de belleza esenciales para ti o tu negocio. Te acompañamos a elevar tu pasión al siguiente nivel.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start">
                   <Link href="/catalog" className="bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/20 flex items-center justify-center">
@@ -41,7 +45,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative flex justify-center mt-10 md:mt-0">
+            <div className="relative flex justify-center mt-4 md:mt-0">
               <div className="relative w-full aspect-square max-w-[450px]">
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
                 <Image
@@ -60,22 +64,27 @@ export default function Home() {
       </section>
 
       {/* Marquee Section */}
-      <section className="py-12 bg-white overflow-hidden border-y border-primary/5">
+      <section className="py-4 md:py-12 bg-white overflow-hidden border-y border-primary/5 relative">
+        {/* Gradient Mask for edges */}
+        <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-white to-transparent z-10" />
+
         <div className="flex whitespace-nowrap overflow-hidden">
-          <div className="animate-marquee flex items-center gap-16 px-16">
-            {["Salome", "Dolce Bella", "Ushas", "Aria", "BOUTIQUE"].map((brand) => (
-              <span key={brand} className="text-3xl font-black text-primary/30 uppercase italic">{brand}</span>
-            ))}
-            {/* Duplicate for seamless loop */}
-            {["Salome", "Dolce Bella", "Ushas", "Aria", "BOUTIQUE"].map((brand) => (
-              <span key={brand + '-dup'} className="text-3xl font-black text-primary/30 uppercase italic">{brand}</span>
+          <div className="flex animate-marquee items-center gap-10 md:gap-16 px-4 md:px-16 w-max will-change-transform">
+            {[...categories, ...categories, ...categories, ...categories].map((cat, i) => (
+              <span
+                key={`${cat}-${i}`}
+                className="flex-shrink-0 text-2xl md:text-5xl font-black text-primary/40 uppercase italic font-brand tracking-widest"
+              >
+                {cat}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
       {/* How to Buy Section */}
-      <section className="py-20 px-6 bg-white relative overflow-hidden">
+      <section className="py-10 md:py-20 px-6 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-4xl md:text-5xl font-black text-background-dark">
@@ -144,7 +153,7 @@ export default function Home() {
       <CombosSection />
 
       {/* Wholesale Info Section */}
-      <section id="wholesale-info" className="py-20 px-6 bg-background-dark relative overflow-hidden text-white">
+      <section id="wholesale-info" className="py-6 md:py-20 px-4 md:px-6 bg-background-dark relative overflow-hidden text-white">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
 
@@ -200,7 +209,7 @@ export default function Home() {
           <div className="relative">
             <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10 group">
               <Image
-                src="/assets/home/wholesale-collage.jpg"
+                src="/assets/home/wholesale_collage.jpg"
                 alt="Wholesale Makeup"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"

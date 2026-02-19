@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   description: 'Premium personal care products for your best self.',
 };
 
+import BottomNav from '@/components/layout/BottomNav';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,10 +59,11 @@ export default function RootLayout({
 
         <div className="relative z-10">
           <Navbar />
-          <main className="min-h-screen pt-2 pb-20">
+          <main className="min-h-screen pt-2 pb-24 md:pb-20">
             {children}
           </main>
           <Footer />
+          <BottomNav />
           <ProductModal />
           <WhatsAppFAB />
           <Toast />
