@@ -135,12 +135,12 @@ export default function InstagramFeed() {
         <section className="bg-brand-pattern bg-cover bg-center py-8 md:py-20 px-4 md:px-6 relative after:absolute after:inset-0 after:bg-white/95 after:backdrop-blur-[2px]">
             <div className="max-w-7xl mx-auto relative z-10">
 
-                {/* Profile Header - Redesigned to exactly match screenshot */}
-                <div className="bg-white rounded-[2.5rem] p-8 md:p-12 mb-8 md:mb-12 border border-slate-100 shadow-2xl animate-in fade-in slide-in-from-top-6 duration-1000 max-w-2xl mx-auto ring-1 ring-slate-200/50">
-                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start text-center md:text-left">
+                {/* Profile Header - Optimized for mobile responsiveness */}
+                <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-12 mb-8 md:mb-12 border border-slate-100 shadow-2xl animate-in fade-in slide-in-from-top-6 duration-1000 max-w-2xl mx-auto ring-1 ring-slate-200/50 overflow-hidden">
+                    <div className="flex flex-col md:flex-row gap-5 md:gap-10 items-center md:items-start text-center md:text-left">
                         {/* Profile Picture with Instagram Gradient */}
                         <div className="relative flex-shrink-0">
-                            <div className="w-28 h-28 md:w-40 md:h-40 rounded-full p-1.5 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]">
+                            <div className="w-24 h-24 md:w-40 md:h-40 rounded-full p-1.5 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]">
                                 <div className="w-full h-full rounded-full bg-white p-1">
                                     <div className="w-full h-full rounded-full relative overflow-hidden bg-slate-50 flex items-center justify-center">
                                         <Logo className="absolute inset-0 w-full h-full p-4 md:p-7" />
@@ -150,12 +150,12 @@ export default function InstagramFeed() {
                         </div>
 
                         {/* Profile Info & Stats */}
-                        <div className="flex-1 space-y-6 w-full">
+                        <div className="flex-1 space-y-5 md:space-y-6 w-full min-w-0">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center justify-center md:justify-start gap-2">
-                                    <h3 className="font-extrabold text-background-dark text-3xl md:text-3xl tracking-tighter">loyafu.ve</h3>
-                                    <div className="text-[#0095f6] flex items-center justify-center">
-                                        <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg">
+                                    <h3 className="font-extrabold text-background-dark text-2xl md:text-3xl tracking-tighter truncate">loyafu.ve</h3>
+                                    <div className="text-[#0095f6] flex items-center justify-center flex-shrink-0">
+                                        <svg viewBox="0 0 24 24" className="w-5 h-5 md:w-6 md:h-6 fill-current" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7l-3.3-3.3c-.4-.4-.4-1 0-1.4s1-.4 1.4 0l1.9 1.9 5.3-5.3c.4-.4 1-.4 1.4 0s.4 1 0 1.4l-6 6c-.4.4-1 .4-1.4 0z" />
                                         </svg>
                                     </div>
@@ -163,35 +163,35 @@ export default function InstagramFeed() {
                                 <Link
                                     href="https://www.instagram.com/loyafu.ve/"
                                     target="_blank"
-                                    className="bg-[#9d33f7] text-white text-sm font-black px-12 py-3 rounded-2xl hover:bg-primary-dark transition-all inline-block w-full md:w-fit shadow-lg shadow-purple-500/20 active:scale-95"
+                                    className="bg-[#9d33f7] text-white text-sm font-black px-6 md:px-12 py-3 rounded-2xl hover:bg-primary-dark transition-all inline-block w-full md:w-fit shadow-lg shadow-purple-500/20 active:scale-95 whitespace-nowrap"
                                 >
                                     Follow
                                 </Link>
                             </div>
 
-                            {/* Stats Inline */}
-                            <div className="flex items-center justify-center md:justify-start gap-6 md:gap-10 border-y md:border-none py-4 md:py-0 border-slate-100">
+                            {/* Stats Inline - Responsive gaps */}
+                            <div className="flex items-center justify-center md:justify-start gap-3 min-[400px]:gap-6 md:gap-10 border-y md:border-none py-4 md:py-0 border-slate-100">
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-lg font-black text-background-dark">50</span>
-                                    <span className="text-sm text-background-dark/80 font-medium">publicaciones</span>
+                                    <span className="text-base md:text-lg font-black text-background-dark">50</span>
+                                    <span className="text-[10px] min-[400px]:text-xs md:text-sm text-background-dark/80 font-medium">publicaciones</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-lg font-black text-background-dark">14.1k</span>
-                                    <span className="text-sm text-background-dark/80 font-medium">seguidores</span>
+                                    <span className="text-base md:text-lg font-black text-background-dark">14.1k</span>
+                                    <span className="text-[10px] min-[400px]:text-xs md:text-sm text-background-dark/80 font-medium">seguidores</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-lg font-black text-background-dark">1.000</span>
-                                    <span className="text-sm text-background-dark/80 font-medium">seguidos</span>
+                                    <span className="text-base md:text-lg font-black text-background-dark">1.000</span>
+                                    <span className="text-[10px] min-[400px]:text-xs md:text-sm text-background-dark/80 font-medium">seguidos</span>
                                 </div>
                             </div>
 
                             {/* Bio Info with exact icons */}
-                            <div className="text-[15px] md:text-[16px] text-background-dark leading-snug space-y-1">
+                            <div className="text-[14px] md:text-[16px] text-background-dark leading-snug space-y-1">
                                 <p className="font-extrabold mb-1">Loyafu Beauty | Makeup & Skincare</p>
                                 <p className="font-medium flex items-center justify-center md:justify-start gap-2">✨ Tu mejor versión empieza aquí</p>
                                 <p className="font-medium flex items-center justify-center md:justify-start gap-2">🌿 Cosmética premium y en tendencia</p>
                                 <p className="font-medium flex items-center justify-center md:justify-start gap-2">📦 Envíos a todo el país</p>
-                                <Link href="/" className="text-[#00376b] font-bold hover:underline block mt-2 text-lg">www.loyafu.ve/</Link>
+                                <Link href="/" className="text-[#00376b] font-bold hover:underline block mt-2 text-base md:text-lg">www.loyafu.ve/</Link>
                             </div>
                         </div>
                     </div>
