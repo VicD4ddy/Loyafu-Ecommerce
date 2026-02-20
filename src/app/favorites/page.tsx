@@ -42,7 +42,7 @@ export default function FavoritesPage() {
                             className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-sm hover:shadow-red-500/20 active:scale-95 group"
                         >
                             <Trash2 className="w-4 h-4 transition-transform group-hover:rotate-12" />
-                            Limpiar lista
+                            Vaciar Favoritos
                         </button>
                     )}
                 </div>

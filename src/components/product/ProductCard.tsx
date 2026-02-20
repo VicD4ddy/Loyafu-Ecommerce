@@ -33,7 +33,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     const [mounted, setMounted] = useState(false);
 
     // Safety check for hooks
-    const isFavoriteFunc = useFavoritesStore((state) => state.isFavorite);
+    const favorites = useFavoritesStore((state) => state.favorites);
     const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
     const openModal = useProductModalStore((state) => state.openModal);
 
@@ -56,7 +56,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
     };
 
-    const isFavorite = mounted ? isFavoriteFunc(product.id) : false;
+    const isFavorite = mounted ? favorites.some((p) => p.id === product.id) : false;
 
     const price = currency === 'USD' ? product.priceUSD : product.priceUSD * exchangeRate;
     const currencySymbol = currency === 'USD' ? '$' : 'Bs.';
