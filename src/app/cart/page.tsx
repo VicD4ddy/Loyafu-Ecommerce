@@ -77,7 +77,7 @@ export default function Cart() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 md:px-6 pt-20 md:pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-12">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
 
                 {/* Left Column: Cart Content */}

@@ -19,7 +19,7 @@ export default function FavoritesPage() {
     if (!mounted) return null;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-24 pb-8 min-h-[80vh]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 min-h-[80vh]">
 
             {/* Breadcrumbs & Hero */}
             <div className="mb-6 md:mb-8 space-y-1 md:space-y-2">
