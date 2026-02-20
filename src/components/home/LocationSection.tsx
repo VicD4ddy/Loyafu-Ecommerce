@@ -40,22 +40,34 @@ export default function LocationSection({ className }: { className?: string }) {
                                 </div>
                             </div>
 
-                            <div className="grid sm:grid-cols-2 gap-4">
-                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary">
+                            <div className="space-y-4">
+                                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
+                                    <div className="flex items-center gap-3 text-primary mb-2">
                                         <Clock className="w-5 h-5" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Horarios de Atención</span>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Horario</p>
-                                        <p className="text-sm font-bold text-background-dark">9:00 AM - 5:00 PM</p>
+                                    <div className="grid gap-3">
+                                        <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                            <span className="text-xs font-bold text-slate-500 uppercase">Lunes a Viernes</span>
+                                            <span className="text-sm font-black text-background-dark tracking-tight">10:00am - 04:00pm</span>
+                                        </div>
+                                        <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                            <span className="text-xs font-bold text-slate-500 uppercase">Sábados</span>
+                                            <span className="text-sm font-black text-background-dark tracking-tight">11:00am - 04:00pm</span>
+                                        </div>
+                                        <div className="flex justify-between items-center bg-primary/5 p-3 rounded-xl border border-primary/10">
+                                            <span className="text-xs font-bold text-primary/60 uppercase">Domingos</span>
+                                            <span className="text-sm font-black text-primary/40 uppercase italic tracking-tighter">Cerrado</span>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                                     <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary">
                                         <Phone className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Contacto</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Atención al Cliente</p>
                                         <p className="text-sm font-bold text-background-dark">Valencia, Centro</p>
                                     </div>
                                 </div>
