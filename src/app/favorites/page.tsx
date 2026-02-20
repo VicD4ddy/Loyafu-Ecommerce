@@ -2,7 +2,7 @@
 
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import ProductCard from '@/components/product/ProductCard';
-import { Heart, ChevronRight, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Heart, ChevronRight, ShoppingBag, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -39,8 +39,9 @@ export default function FavoritesPage() {
                     {favorites.length > 0 && (
                         <button
                             onClick={clearFavorites}
-                            className="text-red-500 hover:text-red-700 font-bold text-sm underline transition-colors"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-sm hover:shadow-red-500/20 active:scale-95 group"
                         >
+                            <Trash2 className="w-4 h-4 transition-transform group-hover:rotate-12" />
                             Limpiar lista
                         </button>
                     )}

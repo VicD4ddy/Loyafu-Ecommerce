@@ -162,30 +162,40 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                     </>
                 )}
 
-                {/* Favorite Button */}
+                {/* Favorite Button - Premium Glassmorphism */}
                 <button
                     onClick={handleToggleFavorite}
                     className={cn(
-                        "absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm z-20",
-                        isFavorite ? "text-red-500 bg-red-50 hover:bg-red-100 ring-2 ring-red-100" : "text-primary/40 hover:text-primary hover:bg-white"
+                        "absolute top-3 right-3 w-9 h-9 backdrop-blur-md rounded-full flex items-center justify-center transition-all shadow-xl z-20 group/fav",
+                        isFavorite
+                            ? "text-red-500 bg-white/95 ring-1 ring-red-100 scale-105"
+                            : "text-primary/40 bg-white/40 hover:bg-white hover:text-primary border border-white/20"
                     )}
                 >
-                    <Heart className={cn("w-4 h-4 transition-transform active:scale-90", isFavorite && "fill-current")} />
+                    <Heart className={cn(
+                        "w-4.5 h-4.5 transition-all duration-300 group-active/fav:scale-75",
+                        isFavorite && "fill-current animate-hover-pop"
+                    )} />
                 </button>
 
-                {/* Quick Add Button — Mobile Persistent / Desktop Hover */}
+                {/* Quick Add Button — Refined & Professional */}
                 <div className="absolute bottom-3 right-3 z-30">
                     <button
                         onClick={handleAddToCart}
                         disabled={badge === 'agotado'}
                         className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-90",
+                            "w-11 h-11 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 active:scale-95 group/cart",
                             badge === 'agotado'
-                                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-                                : "bg-primary text-white hover:bg-primary-dark hover:scale-110 shadow-primary/30"
+                                ? "bg-slate-300/80 backdrop-blur-sm text-slate-500 cursor-not-allowed"
+                                : "bg-primary text-white hover:bg-primary-dark hover:-translate-y-1 shadow-primary/40 ring-4 ring-primary/10"
                         )}
                     >
-                        <Plus className="w-6 h-6" />
+                        <ShoppingCart className="w-5 h-5 transition-transform group-hover/cart:scale-110" />
+
+                        {/* Shimmer Effect on hover */}
+                        {!badge && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/cart:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+                        )}
                     </button>
                 </div>
 
