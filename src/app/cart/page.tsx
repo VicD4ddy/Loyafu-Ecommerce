@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, Truck, ArrowRight, ShieldCheck, Leaf, MessageCircle, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, Trash2, Truck, ArrowRight, ShieldCheck, Leaf, MessageCircle, ShoppingBag, Percent } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 export default function Cart() {
     const { items, removeItem, updateQuantity, updateItemColor, getTotal, currency, exchangeRate } = useCartStore();
     const [mounted, setMounted] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<'pago_movil' | 'binance' | 'divisa'>('pago_movil');
 
     useEffect(() => {
         setMounted(true);
@@ -17,10 +18,13 @@ export default function Cart() {
 
     if (!mounted) return null;
 
-    const totalUSD = getTotal();
+    const subtotalUSD = getTotal();
+    const hasDiscount = paymentMethod === 'binance' || paymentMethod === 'divisa';
+    const discountAmount = hasDiscount ? subtotalUSD * 0.25 : 0;
+    const totalUSD = subtotalUSD - discountAmount;
+
     const totalBs = totalUSD * exchangeRate;
     const currencySymbol = currency === 'USD' ? '$' : 'Bs.';
-    const displayTotal = currency === 'USD' ? totalUSD : totalBs;
 
     const handleQuantityChange = (id: string, current: number, delta: number, color?: string) => {
         const newQuantity = current + delta;
@@ -44,12 +48,21 @@ export default function Cart() {
             message += "\n";
         });
 
+        message += `\nMétodo de Pago: ${paymentMethod === 'binance' ? 'Binance' : paymentMethod === 'divisa' ? 'Divisa (Efectivo)' : 'Pago Móvil'}\n`;
+
+        if (hasDiscount) {
+            message += `Subtotal: ${currencySymbol}${subtotalUSD.toFixed(2)}\n`;
+            message += `Descuento (25% off): -${currencySymbol}${discountAmount.toFixed(2)}\n`;
+        }
+
         const currentTotal = currency === 'USD' ? totalUSD : totalBs;
-        message += `\nTotal: ${currencySymbol}${currentTotal.toFixed(2)}`;
+        message += `Total Final: ${currencySymbol}${currentTotal.toFixed(2)}`;
         if (exchangeRate > 0) {
-            message += ` / Bs.${totalBs.toFixed(2)}`;
+            const totalBsFinal = totalUSD * exchangeRate;
+            message += ` / Bs.${totalBsFinal.toFixed(2)}`;
         }
         message += `\n\n(Tasa ref: ${exchangeRate.toFixed(2)})`;
+        message += `\n* Precios no incluyen IVA.`;
 
         return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     };
@@ -224,8 +237,44 @@ export default function Cart() {
                                     <span>Tasa ref. BCV</span>
                                     <span className="text-primary-light">{exchangeRate.toFixed(2)} Bs/$</span>
                                 </div>
+                                <div className="space-y-2 py-3 border-t border-white/10">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Método de Pago</span>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'pago_movil', label: 'Pago Móvil' },
+                                            { id: 'divisa', label: 'Divisa', discount: true },
+                                            { id: 'binance', label: 'Binance', discount: true }
+                                        ].map((method) => (
+                                            <button
+                                                key={method.id}
+                                                onClick={() => setPaymentMethod(method.id as any)}
+                                                className={cn(
+                                                    "relative py-2.5 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all border",
+                                                    paymentMethod === method.id
+                                                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105"
+                                                        : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+                                                )}
+                                            >
+                                                {method.label}
+                                                {method.discount && (
+                                                    <span className="absolute -top-1.5 -right-1 bg-green-500 text-white text-[6px] px-1 rounded-full animate-bounce">
+                                                        -25%
+                                                    </span>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="flex justify-between items-end py-3 border-t border-white/10">
-                                    <span className="text-xs font-bold text-slate-300">Total Final</span>
+                                    <div className="space-y-1">
+                                        <span className="text-xs font-bold text-slate-300">Total Final</span>
+                                        {hasDiscount && (
+                                            <div className="text-[10px] text-green-400 font-bold flex items-center gap-1">
+                                                <Percent className="w-3 h-3" /> Ahorraste ${discountAmount.toFixed(2)}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="text-right">
                                         <div className="text-2xl font-black text-primary-light tracking-tighter tabular-nums leading-none">
                                             {currency === 'USD' ? `$${totalUSD.toFixed(2)}` : `${totalBs.toFixed(2)} Bs`}
@@ -236,6 +285,10 @@ export default function Cart() {
                                             <span className="text-[9px] font-bold text-slate-400 mt-0.5 inline-block">${totalUSD.toFixed(2)} USD</span>
                                         )}
                                     </div>
+                                </div>
+
+                                <div className="text-[9px] text-slate-500 text-center italic py-1">
+                                    * Nuestros precios no incluyen IVA
                                 </div>
 
                                 <a
@@ -273,10 +326,55 @@ export default function Cart() {
                                 <div className="flex justify-between text-slate-400 font-bold text-xs uppercase tracking-widest">
                                     <span>Subtotal</span>
                                     <div className="text-right">
-                                        <div className="text-white text-sm">${totalUSD.toFixed(2)}</div>
-                                        <div className="text-primary-light/60 text-[10px]">({totalBs.toFixed(2)} Bs)</div>
+                                        <div className="text-white text-sm">${subtotalUSD.toFixed(2)}</div>
+                                        <div className="text-primary-light/60 text-[10px]">({(subtotalUSD * exchangeRate).toFixed(2)} Bs)</div>
                                     </div>
                                 </div>
+
+                                {/* Payment Method Selector (Desktop) */}
+                                <div className="space-y-3 py-4 border-t border-white/5">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Método de Pago</span>
+                                        <span className="text-[10px] font-bold text-green-400 animate-pulse">25% OFF con Binance/Cash</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {[
+                                            { id: 'pago_movil', label: 'Pago Móvil', sub: 'Tasa BCV' },
+                                            { id: 'divisa', label: 'Divisa (Efectivo)', sub: '25% DESCUENTO' },
+                                            { id: 'binance', label: 'Binance (USDT)', sub: '25% DESCUENTO' }
+                                        ].map((method) => (
+                                            <button
+                                                key={method.id}
+                                                onClick={() => setPaymentMethod(method.id as any)}
+                                                className={cn(
+                                                    "flex items-center justify-between px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all border group",
+                                                    paymentMethod === method.id
+                                                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 translate-x-1"
+                                                        : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white"
+                                                )}
+                                            >
+                                                <span>{method.label}</span>
+                                                <span className={cn(
+                                                    "text-[9px] font-bold px-2 py-0.5 rounded-full",
+                                                    paymentMethod === method.id ? "bg-white/20 text-white" : "bg-white/10 text-slate-500 group-hover:text-slate-300"
+                                                )}>
+                                                    {method.sub}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {hasDiscount && (
+                                    <div className="flex justify-between items-center bg-green-500/10 p-3 rounded-xl border border-green-500/20 animate-in fade-in zoom-in duration-300">
+                                        <div className="flex items-center gap-2 text-green-400">
+                                            <Percent className="w-4 h-4" />
+                                            <span className="text-[10px] font-black uppercase">Ahorro Aplicado (25%)</span>
+                                        </div>
+                                        <span className="text-sm font-black text-green-400">-${discountAmount.toFixed(2)}</span>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-between text-slate-400 font-bold text-[10px] uppercase tracking-widest pt-2 border-t border-white/5">
                                     <span>Tasa ref. BCV</span>
                                     <span className="text-primary-light">{exchangeRate.toFixed(2)} Bs/$</span>
@@ -294,6 +392,9 @@ export default function Cart() {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div className="text-[10px] text-primary-light/60 font-medium text-center italic border-t border-white/5 pt-2">
+                                    * Nuestros precios no incluyen IVA
                                 </div>
                             </div>
 

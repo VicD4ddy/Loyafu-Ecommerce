@@ -248,6 +248,9 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                                         )}
                                     </span>
                                 )}
+                                <span className="text-[8px] md:text-[9px] text-slate-400 font-medium italic mt-0.5">
+                                    Nuestros precios no incluyen IVA
+                                </span>
                             </>
                         )}
                     </div>

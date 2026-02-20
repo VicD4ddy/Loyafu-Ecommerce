@@ -46,11 +46,27 @@ export default function Instructions() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/30 transition-colors" />
                 <div className="relative z-10 space-y-6">
                     <div className="flex items-center gap-3">
-                        <MessageCircle className="w-6 h-6 text-primary-light" />
-                        <h2 className="text-2xl font-black tracking-tighter uppercase">¿Tienes dudas adicionales?</h2>
+                        <HelpCircle className="w-6 h-6 text-primary-light" />
+                        <h2 className="text-2xl font-black tracking-tighter uppercase">Métodos de Pago</h2>
                     </div>
-                    <p className="text-slate-300 font-medium leading-relaxed">
-                        Nuestro equipo de atención al cliente está disponible para guiarte en cada paso. Escríbenos directamente por WhatsApp y te responderemos a la brevedad posible.
+                    <div className="grid gap-4">
+                        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-bold">%</div>
+                            <div>
+                                <h4 className="font-black uppercase text-sm tracking-tight">Divisas y Binance</h4>
+                                <p className="text-xs text-slate-400 font-medium">¡Obtén un <span className="text-green-400 font-bold">25% de descuento</span> pagando por estos medios!</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary-light font-bold">$</div>
+                            <div>
+                                <h4 className="font-black uppercase text-sm tracking-tight">Pago Móvil</h4>
+                                <p className="text-xs text-slate-400 font-medium">Aceptamos transferencias nacionales a tasa BCV del día.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p className="text-slate-300 font-medium leading-relaxed text-sm">
+                        * Recuerda que nuestros precios mostrados en el catálogo <span className="text-white font-bold italic">no incluyen IVA</span>.
                     </p>
                     <a
                         href="https://wa.me/584244096534"
