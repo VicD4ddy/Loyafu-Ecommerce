@@ -1,11 +1,24 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Instagram, MessageCircle, Banknote, Smartphone, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
+import { cn } from '@/lib/utils';
 
 export default function Footer() {
+    const pathname = usePathname();
+
+    // Pages where the footer should be hidden ON MOBILE only
+    const hideOnMobilePaths = ['/catalog', '/favorites', '/cart'];
+    const shouldHideOnMobile = hideOnMobilePaths.includes(pathname);
+
     return (
-        <footer className="bg-white border-t border-primary/5 py-16 md:py-24 relative overflow-hidden">
+        <footer className={cn(
+            "bg-white border-t border-primary/5 py-16 md:py-24 relative overflow-hidden",
+            shouldHideOnMobile && "hidden md:block" // Hidden on mobile, shown on desktop for specific routes
+        )}>
             {/* Background Glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
