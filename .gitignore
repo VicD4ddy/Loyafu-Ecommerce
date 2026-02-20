@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Gemini AI
 .gemini/
+
+# Brand Assets (Large source files)
+/brand_assets/
