@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Instagram, Play, Layers, Heart, MessageCircle, Calendar, ExternalLink, Sparkles, Zap, Tag } from 'lucide-react';
+import { Instagram, Play, Layers, Heart, MessageCircle, Calendar, ExternalLink, Sparkles, Zap, Tag, Image as ImageIcon, Bookmark } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import { cn } from '@/lib/utils';
 
@@ -135,90 +135,84 @@ export default function InstagramFeed() {
         <section className="bg-brand-pattern bg-cover bg-center py-8 md:py-20 px-4 md:px-6 relative after:absolute after:inset-0 after:bg-white/95 after:backdrop-blur-[2px]">
             <div className="max-w-7xl mx-auto relative z-10">
 
-                {/* Profile Header - Redesigned matching screenshot */}
-                <div className="bg-white/70 backdrop-blur-md rounded-3xl p-6 md:p-12 mb-8 md:mb-12 border border-primary/10 shadow-xl animate-in fade-in slide-in-from-top-6 duration-1000 max-w-4xl mx-auto">
-                    <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-center md:items-start text-center md:text-left">
-                        {/* Profile Picture */}
+                {/* Profile Header - Redesigned to exactly match screenshot */}
+                <div className="bg-white rounded-[2.5rem] p-8 md:p-12 mb-8 md:mb-12 border border-slate-100 shadow-2xl animate-in fade-in slide-in-from-top-6 duration-1000 max-w-2xl mx-auto ring-1 ring-slate-200/50">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start text-center md:text-left">
+                        {/* Profile Picture with Instagram Gradient */}
                         <div className="relative flex-shrink-0">
-                            <div className="w-24 h-24 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]">
-                                <div className="w-full h-full rounded-full bg-white p-0.5">
+                            <div className="w-28 h-28 md:w-40 md:h-40 rounded-full p-1.5 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]">
+                                <div className="w-full h-full rounded-full bg-white p-1">
                                     <div className="w-full h-full rounded-full relative overflow-hidden bg-slate-50 flex items-center justify-center">
-                                        <Instagram className="w-8 h-8 md:w-16 md:h-16 text-primary/10" />
                                         <Logo className="absolute inset-0 w-full h-full p-4 md:p-7" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Profile Info & Stats Container */}
-                        <div className="flex-1 space-y-6">
-                            {/* Top row: Username & Link */}
-                            <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                <Link
-                                    href="https://www.instagram.com/loyafu.ve/"
-                                    target="_blank"
-                                    className="flex items-center justify-center md:justify-start gap-2 hover:opacity-80 transition-opacity"
-                                >
-                                    <h3 className="font-black text-background-dark text-xl md:text-2xl tracking-tight">loyafu.ve</h3>
-                                    <div className="bg-[#0095f6] rounded-full p-0.5 shadow-sm">
-                                        <svg viewBox="0 0 24 24" className="w-3 h-3 md:w-3.5 md:h-3.5 fill-white" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                        {/* Profile Info & Stats */}
+                        <div className="flex-1 space-y-6 w-full">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div className="flex items-center justify-center md:justify-start gap-2">
+                                    <h3 className="font-extrabold text-background-dark text-3xl md:text-3xl tracking-tighter">loyafu.ve</h3>
+                                    <div className="text-[#0095f6] flex items-center justify-center">
+                                        <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7l-3.3-3.3c-.4-.4-.4-1 0-1.4s1-.4 1.4 0l1.9 1.9 5.3-5.3c.4-.4 1-.4 1.4 0s.4 1 0 1.4l-6 6c-.4.4-1 .4-1.4 0z" />
                                         </svg>
                                     </div>
-                                </Link>
+                                </div>
                                 <Link
                                     href="https://www.instagram.com/loyafu.ve/"
                                     target="_blank"
-                                    className="bg-primary text-white text-sm font-bold px-6 py-1.5 rounded-lg hover:bg-primary-dark transition-colors inline-block w-fit mx-auto md:mx-0"
+                                    className="bg-[#9d33f7] text-white text-sm font-black px-12 py-3 rounded-2xl hover:bg-primary-dark transition-all inline-block w-full md:w-fit shadow-lg shadow-purple-500/20 active:scale-95"
                                 >
-                                    Seguir
+                                    Follow
                                 </Link>
                             </div>
 
-                            {/* Middle row: Stats */}
-                            <div className="flex items-center justify-center md:justify-start gap-8 md:gap-12 border-y md:border-none py-4 md:py-0 border-primary/5">
-                                <div className="flex flex-col md:flex-row md:items-center md:gap-1.5">
-                                    <span className="text-base md:text-lg font-black text-background-dark">{user?.media_count || 50}</span>
-                                    <span className="text-[10px] md:text-sm text-slate-500 md:text-background-dark/70 font-medium">publicaciones</span>
+                            {/* Stats Inline */}
+                            <div className="flex items-center justify-center md:justify-start gap-6 md:gap-10 border-y md:border-none py-4 md:py-0 border-slate-100">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-lg font-black text-background-dark">50</span>
+                                    <span className="text-sm text-background-dark/80 font-medium">publicaciones</span>
                                 </div>
-                                <div className="flex flex-col md:flex-row md:items-center md:gap-1.5">
-                                    <span className="text-base md:text-lg font-black text-background-dark">14,1k</span>
-                                    <span className="text-[10px] md:text-sm text-slate-500 md:text-background-dark/70 font-medium">seguidores</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-lg font-black text-background-dark">14.1k</span>
+                                    <span className="text-sm text-background-dark/80 font-medium">seguidores</span>
                                 </div>
-                                <div className="flex flex-col md:flex-row md:items-center md:gap-1.5">
-                                    <span className="text-base md:text-lg font-black text-background-dark">1.000</span>
-                                    <span className="text-[10px] md:text-sm text-slate-500 md:text-background-dark/70 font-medium">seguidos</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-lg font-black text-background-dark">1.000</span>
+                                    <span className="text-sm text-background-dark/80 font-medium">seguidos</span>
                                 </div>
                             </div>
 
-                            {/* Bottom row: Bio Info */}
-                            <div className="text-[14px] md:text-[15px] text-slate-600 leading-relaxed max-w-md">
-                                <p className="font-bold text-background-dark block mb-1">Loyafu Beauty | Makeup & Skincare</p>
-                                <p>✨ Tu mejor versión empieza aquí</p>
-                                <p>🌿 Cosmética premium y en tendencia</p>
-                                <p>📦 Envíos a todo el país</p>
-                                <Link href="/" className="text-blue-900 font-bold hover:underline block mt-2">www.loyafu.ve/</Link>
+                            {/* Bio Info with exact icons */}
+                            <div className="text-[15px] md:text-[16px] text-background-dark leading-snug space-y-1">
+                                <p className="font-extrabold mb-1">Loyafu Beauty | Makeup & Skincare</p>
+                                <p className="font-medium flex items-center justify-center md:justify-start gap-2">✨ Tu mejor versión empieza aquí</p>
+                                <p className="font-medium flex items-center justify-center md:justify-start gap-2">🌿 Cosmética premium y en tendencia</p>
+                                <p className="font-medium flex items-center justify-center md:justify-start gap-2">📦 Envíos a todo el país</p>
+                                <Link href="/" className="text-[#00376b] font-bold hover:underline block mt-2 text-lg">www.loyafu.ve/</Link>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Filters - Redesigned as Buttons */}
-                <div className="flex flex-wrap items-center justify-center gap-3 mb-8 md:mb-12">
+                {/* Filters - Pill Redesign matching screenshot */}
+                <div className="flex flex-wrap items-center justify-center gap-4 mb-8 md:mb-12">
                     {[
                         { id: 'ALL', label: 'TODOS', icon: Layers },
-                        { id: 'IMAGE', label: 'FOTOS', icon: MessageCircle },
+                        { id: 'IMAGE', label: 'FOTOS', icon: ImageIcon },
                         { id: 'VIDEO', label: 'REELS', icon: Play },
-                        { id: 'CAROUSEL_ALBUM', label: 'COLECCIÓN', icon: Layers }
+                        { id: 'CAROUSEL_ALBUM', label: 'COLECCIÓN', icon: Bookmark }
                     ].map((btn) => (
                         <button
                             key={btn.id}
                             onClick={() => setFilter(btn.id as FilterType)}
                             className={cn(
-                                "flex items-center gap-3 px-8 py-4 rounded-[1.8rem] text-[11px] font-black transition-all tracking-[0.1em] uppercase shadow-sm",
+                                "flex items-center gap-3 px-8 py-3.5 rounded-2xl text-[11px] font-black transition-all tracking-[0.1em] uppercase shadow-sm",
                                 filter === btn.id
-                                    ? "bg-[#9d33f7] text-white shadow-lg shadow-purple-500/30 scale-105"
-                                    : "bg-white text-background-dark/40 border border-slate-200 hover:border-primary/40 hover:text-primary"
+                                    ? "bg-[#9d33f7] text-white shadow-xl shadow-purple-500/30 scale-105"
+                                    : "bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 hover:text-background-dark"
                             )}
                         >
                             <btn.icon className={cn("w-4 h-4", filter === btn.id && "fill-current")} />
