@@ -55,13 +55,13 @@ export async function GET() {
 async function fetchInstagramData(token: string) {
     try {
         // 1. Fetch User Data (Profile Info)
-        const userRes = await fetch(`https://graph.instagram.com/me?fields=id,username,media_count,account_type&access_token=${token}`, {
-            next: { revalidate: 60 } // Reduced for debugging
+        const userRes = await fetch(`https://graph.instagram.com/me?fields=id,username,media_count,account_type&access_token=${token}&t=${Date.now()}`, {
+            cache: 'no-store'
         });
 
         // 2. Fetch Media Data (Posts)
-        const mediaRes = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}`, {
-            next: { revalidate: 60 } // Reduced for debugging
+        const mediaRes = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}&t=${Date.now()}`, {
+            cache: 'no-store'
         });
 
         if (!userRes.ok || !mediaRes.ok) {

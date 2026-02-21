@@ -80,6 +80,7 @@ export default function InstagramFeed() {
                 if (!res.ok) throw new Error('Failed to fetch from internal API');
 
                 const data = await res.json();
+                console.log("Instagram Client Data:", data);
 
                 if (data.user) {
                     setUser(data.user);
