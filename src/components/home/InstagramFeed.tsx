@@ -247,11 +247,12 @@ export default function InstagramFeed() {
                                             </div>
                                         ) : (
                                             <Image
-                                                src={post.media_type === 'VIDEO' ? (post.thumbnail_url || '') : post.media_url}
+                                                src={post.media_type === 'VIDEO' ? (post.thumbnail_url || '/assets/brand/pattern.jpg') : post.media_url}
                                                 fill
                                                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                                                 alt={post.caption ? post.caption.slice(0, 30) : 'Instagram Post'}
                                                 unoptimized
+                                                onError={() => console.error(`Failed to load image for post ${post.id}`, post)}
                                             />
                                         )}
                                     </div>
