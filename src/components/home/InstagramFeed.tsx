@@ -238,13 +238,22 @@ export default function InstagramFeed() {
                                     )}
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
-                                    <Image
-                                        src={post.media_type === 'VIDEO' ? (post.thumbnail_url || post.media_url) : post.media_url}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                        alt={post.caption ? post.caption.slice(0, 30) : 'Instagram Post'}
-                                        unoptimized
-                                    />
+                                    <div className="w-full h-full relative">
+                                        {post.media_type === 'VIDEO' && !post.thumbnail_url ? (
+                                            <div className="absolute inset-0 bg-slate-800 flex flex-col items-center justify-center p-4 text-center">
+                                                <Play className="w-8 h-8 text-white/50 mb-2" />
+                                                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Reel en Instagram</span>
+                                            </div>
+                                        ) : (
+                                            <Image
+                                                src={post.media_type === 'VIDEO' ? (post.thumbnail_url || '') : post.media_url}
+                                                fill
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                alt={post.caption ? post.caption.slice(0, 30) : 'Instagram Post'}
+                                                unoptimized
+                                            />
+                                        )}
+                                    </div>
 
                                     {/* Video / Carousel indicators for mobile visibility */}
                                     <div className="absolute bottom-3 right-3 z-10 md:hidden">
