@@ -20,10 +20,14 @@ export interface CartItem extends Product {
     selectedColor?: string;
 }
 
+export type DeliveryMethod = 'pickup' | 'local_delivery' | 'national_shipping';
+
 interface CartState {
     items: CartItem[];
     currency: 'USD' | 'VES';
     exchangeRate: number; // VES per USD
+    deliveryMethod: DeliveryMethod;
+    setDeliveryMethod: (method: DeliveryMethod) => void;
     addItem: (product: Product, color?: string) => void;
     removeItem: (productId: string, color?: string) => void;
     updateQuantity: (productId: string, quantity: number, color?: string) => void;
@@ -41,6 +45,8 @@ export const useCartStore = create<CartState>()(
             items: [],
             currency: 'USD',
             exchangeRate: 36.5, // Default mock rate, to be updated via API
+            deliveryMethod: 'pickup',
+            setDeliveryMethod: (method) => set({ deliveryMethod: method }),
             addItem: (product, color) =>
                 set((state) => {
                     // Find item with same ID AND same color

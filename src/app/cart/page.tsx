@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 export default function Cart() {
-    const { items, removeItem, updateQuantity, updateItemColor, getTotal, currency, exchangeRate } = useCartStore();
+    const { items, removeItem, updateQuantity, updateItemColor, getTotal, currency, exchangeRate, deliveryMethod, setDeliveryMethod } = useCartStore();
     const [mounted, setMounted] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'pago_movil' | 'binance' | 'divisa'>('pago_movil');
 
@@ -48,7 +48,13 @@ export default function Cart() {
             message += "\n";
         });
 
-        message += `\nMétodo de Pago: ${paymentMethod === 'binance' ? 'Binance' : paymentMethod === 'divisa' ? 'Divisa (Efectivo)' : 'Pago Móvil'}\n`;
+        // Delivery Method Text
+        const deliveryText = deliveryMethod === 'pickup' ? 'Retiro en Tienda (CC Gran Bazar)' :
+            deliveryMethod === 'local_delivery' ? 'Delivery Local (Valencia)' :
+                'Envío Nacional';
+
+        message += `\n📦 Entrega: ${deliveryText}`;
+        message += `\n💳 Método de Pago: ${paymentMethod === 'binance' ? 'Binance' : paymentMethod === 'divisa' ? 'Divisa (Efectivo)' : 'Pago Móvil'}\n`;
 
         if (hasDiscount) {
             message += `Subtotal: ${currencySymbol}${subtotalUSD.toFixed(2)}\n`;
@@ -237,32 +243,63 @@ export default function Cart() {
                                     <span>Tasa ref. BCV</span>
                                     <span className="text-primary-light">{exchangeRate.toFixed(2)} Bs/$</span>
                                 </div>
-                                <div className="space-y-2 py-3 border-t border-white/10">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Método de Pago</span>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {[
-                                            { id: 'pago_movil', label: 'Pago Móvil' },
-                                            { id: 'divisa', label: 'Divisa', discount: true },
-                                            { id: 'binance', label: 'Binance', discount: true }
-                                        ].map((method) => (
-                                            <button
-                                                key={method.id}
-                                                onClick={() => setPaymentMethod(method.id as any)}
-                                                className={cn(
-                                                    "relative py-2.5 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all border",
-                                                    paymentMethod === method.id
-                                                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105"
-                                                        : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
-                                                )}
-                                            >
-                                                {method.label}
-                                                {method.discount && (
-                                                    <span className="absolute -top-1.5 -right-1 bg-green-500 text-white text-[6px] px-1 rounded-full animate-bounce">
-                                                        -25%
-                                                    </span>
-                                                )}
-                                            </button>
-                                        ))}
+                                <div className="space-y-4 py-3 border-t border-white/10">
+                                    {/* Delivery Method Selector (Mobile) */}
+                                    <div className="space-y-2">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Método de Entrega</span>
+                                        <div className="grid grid-cols-3 gap-1.5">
+                                            {[
+                                                { id: 'pickup', label: 'Retiro Local' },
+                                                { id: 'local_delivery', label: 'Delivery' },
+                                                { id: 'national_shipping', label: 'Nacional' }
+                                            ].map((method) => (
+                                                <button
+                                                    key={method.id}
+                                                    onClick={() => setDeliveryMethod(method.id as any)}
+                                                    className={cn(
+                                                        "py-2 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all border",
+                                                        deliveryMethod === method.id
+                                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105"
+                                                            : "bg-[#2a2435] text-slate-400 border-white/5 hover:bg-[#342e40]"
+                                                    )}
+                                                >
+                                                    {method.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Payment Method Selector (Mobile) */}
+                                    <div className="space-y-2 pt-2 border-t border-dashed border-white/10">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Método de Pago</span>
+                                            {hasDiscount && <span className="text-[9px] font-bold text-green-400">-25% Aplicado</span>}
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-1.5">
+                                            {[
+                                                { id: 'pago_movil', label: 'Pago Móvil' },
+                                                { id: 'divisa', label: 'Divisa', discount: true },
+                                                { id: 'binance', label: 'Binance', discount: true }
+                                            ].map((method) => (
+                                                <button
+                                                    key={method.id}
+                                                    onClick={() => setPaymentMethod(method.id as any)}
+                                                    className={cn(
+                                                        "relative py-2.5 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all border",
+                                                        paymentMethod === method.id
+                                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105 z-10"
+                                                            : "bg-[#2a2435] text-slate-400 border-white/5 hover:bg-[#342e40]"
+                                                    )}
+                                                >
+                                                    {method.label}
+                                                    {method.discount && (
+                                                        <span className="absolute -top-1.5 -right-1 bg-green-500 text-white text-[6px] px-1 rounded-full animate-pulse shadow-sm shadow-green-500/50">
+                                                            -25%
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -312,132 +349,121 @@ export default function Cart() {
                 </div>
 
                 {/* Right Column: Order Summary (Desktop Only) */}
-                <div className="lg:w-[380px] hidden lg:block">
-                    <div className="bg-background-dark text-white rounded-[2rem] p-6 shadow-2xl shadow-primary/20 sticky top-28 overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+                <div className="lg:w-[420px] hidden lg:block">
+                    {/* Modern Premium Dark Card matches the uploaded reference image */}
+                    <div className="bg-[#18131e] text-white rounded-[2.5rem] p-8 shadow-[0_20px_60px_-15px_rgba(157,51,247,0.2)] border border-[#ffffff10] sticky top-28 overflow-hidden font-sans">
+                        <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
 
-                        <div className="relative z-10 space-y-6">
-                            <div>
-                                <h3 className="text-xl font-black tracking-tighter mb-1">Resumen</h3>
-                                <div className="w-8 h-1 bg-primary rounded-full" />
+                        <div className="relative z-10 space-y-7">
+                            <div className="flex justify-between items-baseline border-b border-white/5 pb-4">
+                                <span className="font-brand uppercase tracking-widest text-[#a8a3b5] font-black text-[13px]">Subtotal</span>
+                                <div className="text-right">
+                                    <div className="text-2xl font-black">${subtotalUSD.toFixed(2)}</div>
+                                    <div className="text-primary-light/60 font-bold text-[11px]">({(subtotalUSD * exchangeRate).toFixed(2)} BS)</div>
+                                </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <div className="flex justify-between text-slate-400 font-bold text-xs uppercase tracking-widest">
-                                    <span>Subtotal</span>
-                                    <div className="text-right">
-                                        <div className="text-white text-sm">${subtotalUSD.toFixed(2)}</div>
-                                        <div className="text-primary-light/60 text-[10px]">({(subtotalUSD * exchangeRate).toFixed(2)} Bs)</div>
-                                    </div>
-                                </div>
+                            <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                                <span className="font-brand uppercase tracking-widest text-[#a8a3b5] font-black text-[11px]">Tasa Ref. BCV</span>
+                                <span className="text-[#a8a3b5] font-black text-[13px]">{exchangeRate.toFixed(2)} BS/$</span>
+                            </div>
 
-                                {/* Payment Method Selector (Desktop) */}
-                                <div className="space-y-3 py-4 border-t border-white/5">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Método de Pago</span>
-                                        <span className="text-[10px] font-bold text-green-400 animate-pulse">25% OFF con Binance/Cash</span>
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        {[
-                                            { id: 'pago_movil', label: 'Pago Móvil', sub: 'Tasa BCV' },
-                                            { id: 'divisa', label: 'Divisa (Efectivo)', sub: '25% DESCUENTO' },
-                                            { id: 'binance', label: 'Binance (USDT)', sub: '25% DESCUENTO' }
-                                        ].map((method) => (
-                                            <button
-                                                key={method.id}
-                                                onClick={() => setPaymentMethod(method.id as any)}
-                                                className={cn(
-                                                    "flex items-center justify-between px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all border group",
-                                                    paymentMethod === method.id
-                                                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 translate-x-1"
-                                                        : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white"
-                                                )}
-                                            >
-                                                <span>{method.label}</span>
-                                                <span className={cn(
-                                                    "text-[9px] font-bold px-2 py-0.5 rounded-full",
-                                                    paymentMethod === method.id ? "bg-white/20 text-white" : "bg-white/10 text-slate-500 group-hover:text-slate-300"
-                                                )}>
-                                                    {method.sub}
+                            {/* Delivery Method Section */}
+                            <div className="space-y-3">
+                                <h4 className="font-brand uppercase tracking-widest text-[#a8a3b5] font-black text-[11px]">Método de Entrega</h4>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { id: 'pickup', label: 'Retiro en Tienda' },
+                                        { id: 'local_delivery', label: 'Delivery' },
+                                        { id: 'national_shipping', label: 'Nacional' }
+                                    ].map((method) => (
+                                        <button
+                                            key={method.id}
+                                            onClick={() => setDeliveryMethod(method.id as any)}
+                                            className={cn(
+                                                "py-3 rounded-[1.25rem] text-[10px] font-black uppercase tracking-tight transition-all border",
+                                                deliveryMethod === method.id
+                                                    ? "bg-primary text-white border-primary shadow-[0_8px_16px_rgba(157,51,247,0.3)]"
+                                                    : "bg-[#251e30] border-transparent text-[#9a93ab] hover:bg-[#2d2539]"
+                                            )}
+                                        >
+                                            {method.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Payment Method Selector */}
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="font-brand uppercase tracking-widest text-[#a8a3b5] font-black text-[11px]">Método de Pago</h4>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { id: 'pago_movil', label: 'Pago Móvil' },
+                                        { id: 'divisa', label: 'Divisa', discount: true },
+                                        { id: 'binance', label: 'Binance', discount: true }
+                                    ].map((method) => (
+                                        <button
+                                            key={method.id}
+                                            onClick={() => setPaymentMethod(method.id as any)}
+                                            className={cn(
+                                                "relative py-3 rounded-[1.25rem] text-[10px] font-black uppercase tracking-tight transition-all border",
+                                                paymentMethod === method.id
+                                                    ? "bg-primary text-white border-primary shadow-[0_8px_16px_rgba(157,51,247,0.3)]"
+                                                    : "bg-[#251e30] border-transparent text-[#9a93ab] hover:bg-[#2d2539]"
+                                            )}
+                                        >
+                                            {method.label}
+                                            {method.discount && (
+                                                <span className="absolute -top-1.5 -right-1 bg-[#1fe96c] text-[#124225] font-black text-[8px] px-1.5 py-0.5 rounded-md shadow-md">
+                                                    -25%
                                                 </span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {hasDiscount && (
-                                    <div className="flex justify-between items-center bg-green-500/10 p-3 rounded-xl border border-green-500/20 animate-in fade-in zoom-in duration-300">
-                                        <div className="flex items-center gap-2 text-green-400">
-                                            <Percent className="w-4 h-4" />
-                                            <span className="text-[10px] font-black uppercase">Ahorro Aplicado (25%)</span>
-                                        </div>
-                                        <span className="text-sm font-black text-green-400">-${discountAmount.toFixed(2)}</span>
-                                    </div>
-                                )}
-
-                                <div className="flex justify-between text-slate-400 font-bold text-[10px] uppercase tracking-widest pt-2 border-t border-white/5">
-                                    <span>Tasa ref. BCV</span>
-                                    <span className="text-primary-light">{exchangeRate.toFixed(2)} Bs/$</span>
-                                </div>
-
-                                <div className="py-4 border-y border-white/10 space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-base font-bold text-slate-300">Total Final</span>
-                                        <div className="text-right">
-                                            <div className="text-3xl font-black text-primary-light tracking-tighter tabular-nums drop-shadow-2xl leading-none">
-                                                {currency === 'USD' ? `$${totalUSD.toFixed(2)}` : `${totalBs.toFixed(2)} Bs`}
-                                            </div>
-                                            <div className="text-[10px] text-primary-light/60 font-bold mt-1">
-                                                {currency === 'USD' ? `Ref: ${totalBs.toFixed(2)} Bs` : `Ref: $${totalUSD.toFixed(2)}`}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-[10px] text-primary-light/60 font-medium text-center italic border-t border-white/5 pt-2">
-                                    * Nuestros precios no incluyen IVA
+                                            )}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <div className="bg-white/5 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-                                    <label className="flex items-start gap-3 cursor-pointer group">
-                                        <div className="relative flex items-center pt-1">
-                                            <input
-                                                type="checkbox"
-                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-lg border-2 border-white/10 bg-transparent transition-all checked:border-primary checked:bg-primary"
-                                                id="policy-agreement"
-                                            />
-                                            <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                                <ShieldCheck className="w-3 h-3" />
-                                            </div>
+                            {/* Total Final Structure matching design exactly */}
+                            <div className="pt-6 border-t border-white/5 space-y-1">
+                                <div className="flex justify-between items-end">
+                                    <span className="font-brand uppercase tracking-tighter text-white font-black text-[15px]">Total Final</span>
+                                    <div className="text-right">
+                                        <div className="text-4xl font-black text-white tracking-tighter tabular-nums drop-shadow-2xl leading-none">
+                                            ${totalUSD.toFixed(2)}
                                         </div>
-                                        <span className="text-[10px] text-slate-400 font-medium leading-relaxed">
-                                            Acepto las <Link href="/policies" className="text-primary-light font-black hover:underline">Políticas de Compra</Link>, envíos y garantías de Loyafu.
-                                        </span>
-                                    </label>
+                                    </div>
                                 </div>
+                                <div className="flex justify-between items-center mt-1">
+                                    <div>
+                                        {hasDiscount && (
+                                            <span className="text-[#1fe96c] font-black text-[10px] uppercase tracking-wider">Ahorro: -${discountAmount.toFixed(2)}</span>
+                                        )}
+                                    </div>
+                                    <div className="text-[#a8a3b5] font-black text-[14px]">
+                                        {totalBs.toFixed(2)} Bs
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div className="text-[10px] text-[#6d667c] font-medium text-center italic mt-1">
+                                * Nuestros precios no incluyen IVA
+                            </div>
+
+                            {/* CTA WhatsApp Button */}
+                            <div className="pt-2">
                                 <a
                                     href={generateWhatsAppLink()}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group w-full bg-[#25D366] text-white py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-[#20bd5a] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border-b-4 border-green-700/50"
+                                    className="group w-full bg-[#1fe96c] text-[#124225] p-5 rounded-2xl font-black text-lg shadow-[0_10px_25px_rgba(31,233,108,0.2)] hover:bg-[#25ff78] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border-b-4 border-[#129d47]"
                                 >
                                     Pagar por WhatsApp
                                     <MessageCircle className="w-6 h-6 group-hover:rotate-12 transition-transform" />
                                 </a>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3 pt-2">
-                                <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5">
-                                    <ShieldCheck className="w-5 h-5 text-primary-light" />
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Pago Seguro</span>
-                                </div>
-                                <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5">
-                                    <Leaf className="w-5 h-5 text-primary-light" />
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Boutique Pro</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
