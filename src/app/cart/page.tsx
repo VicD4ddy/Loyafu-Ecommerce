@@ -63,11 +63,16 @@ export default function Cart() {
 
         const currentTotal = currency === 'USD' ? totalUSD : totalBs;
         message += `Total Final: ${currencySymbol}${currentTotal.toFixed(2)}`;
-        if (exchangeRate > 0) {
+
+        // Only show Bs equivalent if paying in local currency (Pago Móvil)
+        if (exchangeRate > 0 && paymentMethod === 'pago_movil') {
             const totalBsFinal = totalUSD * exchangeRate;
             message += ` / Bs.${totalBsFinal.toFixed(2)}`;
         }
-        message += `\n\n(Tasa ref: ${exchangeRate.toFixed(2)})`;
+
+        if (paymentMethod === 'pago_movil') {
+            message += `\n\n(Tasa ref: ${exchangeRate.toFixed(2)})`;
+        }
         message += `\n* Precios no incluyen IVA.`;
 
         return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
