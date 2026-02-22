@@ -520,6 +520,7 @@ export default function Cart() {
 
             <DeliveryModal
                 isOpen={isDeliveryModalOpen}
+                deliveryMethod={deliveryMethod}
                 onClose={() => setIsDeliveryModalOpen(false)}
                 onConfirm={(details) => {
                     setDeliveryDetails(details);
