@@ -120,7 +120,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase font-brand italic text-background-dark leading-[0.85]">
-              CÓMO <span className="text-primary">COMPRAR</span>
+              CÓMO COMPRAR <span className="text-primary block text-3xl md:text-5xl mt-2 not-italic tracking-tight">Maquillaje en Loyafu</span>
             </h2>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto">
               Tu pedido listo en 3 simples pasos. Fácil, rápido y seguro.
