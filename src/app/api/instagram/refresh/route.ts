@@ -1,29 +1,35 @@
-
 import { NextResponse } from 'next/server';
-import { getSupabaseService } from '@/lib/supabase-server';
+import { createSupabaseServerClient } from '@/lib/supabase-server';
 
 /**
  * API Route to refresh the Instagram Long-Lived Access Token.
  * Expected to be called by a cron job once a month.
  * Target Table: store_config
  */
-export async function GET() {
-    const supabase = getSupabaseService();
+export async function GET(request: Request) {
+    // Check for authorization header or secret query param to protect this endpoint
+    const { searchParams } = new URL(request.url);
+    const secret = searchParams.get('secret');
 
+    if (secret !== process.env.CRON_SECRET) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const supabase = await createSupabaseServerClient();
     if (!supabase) {
-        return NextResponse.json({ error: 'Supabase client not initialized. Check environment variables.' }, { status: 500 });
+        return NextResponse.json({ error: 'Database client not initialized' }, { status: 500 });
     }
 
     try {
         // 1. Get the current token from Supabase
-        const { data: config, error: fetchError } = await supabase
-            .from('store_config')
+        const { data: configData, error: dbError } = await supabase
+            .from('platform_config')
             .select('value')
             .eq('key', 'instagram_token')
             .single();
 
-        if (fetchError || !config) {
-            console.error('Error fetching token from Supabase:', fetchError);
+        if (dbError || !configData) {
+            console.error('Error fetching token from Supabase:', dbError);
             return NextResponse.json({ error: 'Token not found in database' }, { status: 404 });
         }
 

@@ -6,10 +6,27 @@ import InstagramFeed from '@/components/home/InstagramFeed';
 import LocationSection from '@/components/home/LocationSection';
 import Testimonials from '@/components/home/Testimonials';
 import { PRODUCTS } from '@/data/products';
+import { createSupabaseServerClient } from '@/lib/supabase-server';
 
+export const revalidate = 60; // ISR: revalidate every minute
 
+export default async function Home() {
+  const supabase = await createSupabaseServerClient();
+  const { data: featured } = await supabase
+    .from('featured_product')
+    .select('*')
+    .eq('id', 1)
+    .single();
 
-export default function Home() {
+  // Parse title: Split by new line, fallback to default
+  const titleLines = featured?.title
+    ? featured.title.split('\n')
+    : ["TU MEJOR VERSIÓN ", "EMPIEZA HOY"];
+
+  const description = featured?.description || "Lleva los productos de belleza esenciales para ti o tu negocio. Te acompañamos a elevar tu pasión al siguiente nivel.";
+  const buttonText = featured?.button_text || "Comprar Ahora";
+  const imageUrl = featured?.image_url || "/hero.gif";
+
   // Extract unique categories, filter out empty ones, and normalize
   const categories = Array.from(new Set(PRODUCTS.map(p => p.category))).filter(Boolean);
 
@@ -40,15 +57,19 @@ export default function Home() {
             <div className="space-y-8 text-center md:text-left">
               {/* Hero Content */}
               <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000 text-center md:text-left">
-                <h1 className="text-5xl md:text-8xl font-black leading-[0.9] text-background-dark tracking-tighter font-brand">
-                  TU MEJOR VERSIÓN <span className="text-primary block md:inline">EMPIEZA HOY</span>
+                <h1 className="text-5xl md:text-8xl font-black leading-[0.9] text-background-dark tracking-tighter font-brand" style={{ whiteSpace: 'pre-line' }}>
+                  {titleLines.map((line: string, idx: number) => (
+                    <span key={idx} className={idx === titleLines.length - 1 ? "text-primary block md:inline" : "block md:inline"}>
+                      {line}{' '}
+                    </span>
+                  ))}
                 </h1>
                 <p className="text-lg text-background-dark/70 max-w-md font-medium mx-auto md:mx-0">
-                  Lleva los productos de belleza esenciales para ti o tu negocio. Te acompañamos a elevar tu pasión al siguiente nivel.
+                  {description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start">
                   <Link href="/catalog" className="bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/20 flex items-center justify-center">
-                    Comprar Ahora
+                    {buttonText}
                   </Link>
                 </div>
               </div>
@@ -58,8 +79,8 @@ export default function Home() {
               <div className="relative w-full aspect-square max-w-[450px]">
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
                 <Image
-                  src="/hero.gif"
-                  alt="Hero Animation"
+                  src={imageUrl}
+                  alt={titleLines[0]}
                   fill
                   unoptimized // Important: Keeps the GIF animation playing smoothly
                   priority

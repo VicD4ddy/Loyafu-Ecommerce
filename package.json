@@ -10,6 +10,7 @@
     "build:cloudflare": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.564.0",

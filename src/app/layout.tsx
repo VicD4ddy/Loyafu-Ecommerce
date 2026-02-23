@@ -9,6 +9,7 @@ import ProductModal from '@/components/product/ProductModal';
 import WhatsAppFAB from '@/components/ui/WhatsAppFAB';
 import Toast from '@/components/ui/Toast';
 import ScrollToTop from '@/components/ui/ScrollToTop';
+import PublicLayoutWrapper from '@/components/layout/PublicLayoutWrapper';
 
 import localFont from 'next/font/local';
 
@@ -39,8 +40,6 @@ export const metadata: Metadata = {
   }
 };
 
-import BottomNav from '@/components/layout/BottomNav';
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,18 +61,9 @@ export default function RootLayout({
           />
         </div>
 
-        <div className="relative z-10">
-          <Navbar />
-          <main className="min-h-screen pt-16 md:pt-4 pb-24 md:pb-20">
-            {children}
-          </main>
-          <Footer />
-          <BottomNav />
-          <ProductModal />
-          <WhatsAppFAB />
-          <Toast />
-          <ScrollToTop />
-        </div>
+        <PublicLayoutWrapper>
+          {children}
+        </PublicLayoutWrapper>
       </body>
     </html>
   );
