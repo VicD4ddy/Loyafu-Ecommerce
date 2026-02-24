@@ -8,9 +8,13 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { DeliveryModal } from '@/components/cart/DeliveryModal';
 import { DeliveryDetails } from '@/store/useCartStore';
+import { useSettings } from '@/context/SettingsContext';
+import { useProductModalStore } from '@/store/useProductModalStore';
 
 export default function Cart() {
     const { items, removeItem, updateQuantity, updateItemColor, getTotal, currency, exchangeRate, deliveryMethod, setDeliveryMethod, deliveryDetails, setDeliveryDetails } = useCartStore();
+    const openModal = useProductModalStore((state) => state.openModal);
+    const { getSetting } = useSettings();
     const [mounted, setMounted] = useState(false);
     const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'pago_movil' | 'binance' | 'divisa'>('pago_movil');
@@ -48,8 +52,10 @@ export default function Cart() {
     };
 
     const generateWhatsAppLink = (detailsToUse: DeliveryDetails | null = deliveryDetails) => {
-        const phone = "584244096534";
-        let message = "Hola! Quiero realizar el siguiente pedido en Loyafu:\n\n";
+        const phone = getSetting('whatsapp_number') || "584244096534";
+        const storeName = getSetting('store_name') || "Loyafu";
+        const welcomeMsg = getSetting('delivery_message') || "Hola! Quiero realizar el siguiente pedido";
+        let message = `${welcomeMsg} en ${storeName}:\n\n`;
 
         items.forEach(item => {
             const isWholesale = item.wholesalePrice && item.wholesaleMin && item.quantity >= item.wholesaleMin;
@@ -173,7 +179,8 @@ export default function Cart() {
                             return (
                                 <div
                                     key={`${item.id}-${item.selectedColor || 'none'}`}
-                                    className="group relative bg-white/40 backdrop-blur-sm p-2.5 md:p-4 rounded-[1.25rem] md:rounded-[1.5rem] flex flex-row items-center gap-3 md:gap-5 border border-primary/5 hover:border-primary/20 hover:bg-white transition-all duration-500 shadow-lg shadow-primary/5 animate-fadeInUp"
+                                    onClick={() => openModal(item)}
+                                    className="group relative bg-white/40 backdrop-blur-sm p-2.5 md:p-4 rounded-[1.25rem] md:rounded-[1.5rem] flex flex-row items-center gap-3 md:gap-5 border border-primary/5 hover:border-primary/20 hover:bg-white transition-all duration-500 shadow-lg shadow-primary/5 animate-fadeInUp cursor-pointer"
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
                                     {/* Product Image - Optimized Mobile Size */}

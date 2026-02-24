@@ -6,9 +6,12 @@ import { usePathname } from 'next/navigation';
 import { Instagram, MessageCircle, Banknote, Smartphone, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import { cn } from '@/lib/utils';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function Footer() {
     const pathname = usePathname();
+    const { getSetting } = useSettings();
+    const whatsappNumber = getSetting('whatsapp_number') || '584128824608';
 
     // Pages where the footer should be hidden ON MOBILE only
     const hideOnMobilePaths = ['/catalog', '/favorites', '/cart'];
@@ -50,7 +53,7 @@ export default function Footer() {
                                 <Instagram className="w-5 h-5" />
                             </Link>
                             <Link
-                                href="https://wa.me/584128824608"
+                                href={`https://wa.me/${whatsappNumber}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow-primary/20"

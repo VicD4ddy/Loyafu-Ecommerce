@@ -10,6 +10,7 @@ import WhatsAppFAB from '@/components/ui/WhatsAppFAB';
 import Toast from '@/components/ui/Toast';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import PublicLayoutWrapper from '@/components/layout/PublicLayoutWrapper';
+import { SettingsProvider } from '@/context/SettingsContext';
 
 import localFont from 'next/font/local';
 
@@ -76,7 +77,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={cn(jakarta.variable, atlane.variable, "font-sans antialiased bg-background-light text-background-dark overflow-x-hidden")}>
+      <body className={cn(jakarta.variable, atlane.variable, "font-sans antialiased bg-background-light text-background-dark")}>
 
         {/* Global Background Pattern Overlay */}
         <div className="fixed inset-0 z-0 pointer-events-none">
@@ -90,9 +91,11 @@ export default function RootLayout({
           />
         </div>
 
-        <PublicLayoutWrapper>
-          {children}
-        </PublicLayoutWrapper>
+        <SettingsProvider>
+          <PublicLayoutWrapper>
+            {children}
+          </PublicLayoutWrapper>
+        </SettingsProvider>
       </body>
     </html>
   );

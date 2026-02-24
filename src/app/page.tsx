@@ -31,10 +31,10 @@ export default async function Home() {
   const categories = Array.from(new Set(PRODUCTS.map(p => p.category))).filter(Boolean);
 
   return (
-    <div className="space-y-8 md:space-y-20">
+    <div className="space-y-8 md:space-y-20 overflow-x-hidden">
 
       {/* Hero Section */}
-      <section className="px-6 max-w-7xl mx-auto pt-6 md:pt-32">
+      <section className="px-6 max-w-7xl mx-auto pt-6 md:pt-32 overflow-hidden">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 min-h-[400px] md:min-h-[600px] flex items-center p-4 md:p-16 shadow-2xl shadow-primary/10">
           {/* Abstract blobs */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -53,11 +53,11 @@ export default async function Home() {
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center z-10 w-full">
-            <div className="space-y-8 text-center md:text-left">
+          <div className="grid md:grid-cols-2 gap-12 items-center z-10 w-full overflow-hidden">
+            <div className="space-y-8 text-center md:text-left overflow-hidden">
               {/* Hero Content */}
               <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000 text-center md:text-left">
-                <h1 className="text-5xl md:text-8xl font-black leading-[0.9] text-background-dark tracking-tighter font-brand" style={{ whiteSpace: 'pre-line' }}>
+                <h1 className="text-4xl sm:text-5xl md:text-8xl font-black leading-[0.9] text-background-dark tracking-tighter font-brand break-words" style={{ whiteSpace: 'pre-line' }}>
                   {titleLines.map((line: string, idx: number) => (
                     <span key={idx} className={idx === titleLines.length - 1 ? "text-primary block md:inline" : "block md:inline"}>
                       {line}{' '}

@@ -133,7 +133,7 @@ export default function InstagramFeed() {
     };
 
     return (
-        <section className="bg-brand-pattern bg-cover bg-center py-8 md:py-20 px-4 md:px-6 relative after:absolute after:inset-0 after:bg-white/95 after:backdrop-blur-[2px]">
+        <section className="bg-brand-pattern bg-cover bg-center py-8 md:py-20 px-4 md:px-6 relative after:absolute after:inset-0 after:bg-white/95 after:backdrop-blur-[2px] overflow-hidden">
             <div className="max-w-7xl mx-auto relative z-10">
 
                 {/* Profile Header - Optimized for mobile responsiveness */}

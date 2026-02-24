@@ -64,8 +64,13 @@ async function fetchInstagramData(token: string) {
         });
 
         if (!userRes.ok || !mediaRes.ok) {
-            console.error('Instagram API Error:', await userRes.text(), await mediaRes.text());
-            return NextResponse.json({ error: 'Failed to fetch Instagram data' }, { status: 500 });
+            const userErr = await userRes.json().catch(() => ({}));
+            const mediaErr = await mediaRes.json().catch(() => ({}));
+            console.error('Instagram API Error Details:', { userErr, mediaErr });
+            return NextResponse.json({
+                error: 'Failed to fetch Instagram data',
+                instagram_error: userErr.error || mediaErr.error || 'Unknown Instagram API error'
+            }, { status: userRes.status === 401 || mediaRes.status === 401 ? 401 : 502 });
         }
 
         const user = await userRes.json();

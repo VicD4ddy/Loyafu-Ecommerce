@@ -1,11 +1,15 @@
 "use client";
 
 import { MessageCircle } from 'lucide-react';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function WhatsAppFAB() {
+    const { getSetting } = useSettings();
+    const whatsappNumber = getSetting('whatsapp_number') || '584244096534';
+
     return (
         <a
-            href="https://wa.me/584244096534"
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contactar por WhatsApp"

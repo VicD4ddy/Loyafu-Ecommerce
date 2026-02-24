@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     try {
         // 1. Get the current token from Supabase
         const { data: configData, error: dbError } = await supabase
-            .from('platform_config')
+            .from('store_config')
             .select('value')
             .eq('key', 'instagram_token')
             .single();

@@ -1,26 +1,64 @@
 "use client";
 
 import { SlidersHorizontal, ChevronDown, ArrowUpDown, X, Search, LayoutGrid, List } from 'lucide-react';
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser';
 import ProductCard from '@/components/product/ProductCard';
 import { cn } from '@/lib/utils';
-import { PRODUCTS, CATEGORIES } from '@/data/products';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Suspense } from 'react';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc';
 
 function CatalogContent() {
+    const supabase = createSupabaseBrowserClient();
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState<SortOption>('default');
-    const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [searchTerm, setSearchTerm] = useState(query || '');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [products, setProducts] = useState<any[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
     const ITEMS_PER_PAGE = 12;
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+
+            // Fetch Products
+            const { data: productsData, error: productsError } = await supabase
+                .from('products')
+                .select('*');
+
+            // Fetch Categories
+            const { data: categoriesData, error: categoriesError } = await supabase
+                .from('categories')
+                .select('name')
+                .order('order', { ascending: true });
+
+            if (productsError) console.error('Error fetching products:', productsError);
+            if (categoriesError) console.error('Error fetching categories:', categoriesError);
+
+            const mappedProducts = (productsData || []).map((p: any) => ({
+                ...p,
+                priceUSD: p.price_usd,
+                image: p.image_url,
+                images: p.images || [p.image_url],
+                wholesalePrice: p.wholesale_price,
+                wholesaleMin: p.wholesale_min,
+                badge: p.badge // Ensure badge is also passed if it exists
+            }));
+
+            setProducts(mappedProducts);
+            setCategories(categoriesData?.map((c: any) => c.name) || []);
+            setLoading(false);
+        };
+        fetchData();
+    }, []);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,11 +78,25 @@ function CatalogContent() {
         setCurrentPage(1);
     };
 
-    const filteredProducts = PRODUCTS.filter(p => {
+    const filteredProducts = products.filter(p => {
         const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(p.category);
-        const matchesSearch = !query ||
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            (p.description && p.description.toLowerCase().includes(query.toLowerCase()));
+
+        if (!query) return matchesCategory;
+
+        const searchLower = query.toLowerCase().trim();
+        const nameLower = p.name.toLowerCase();
+        const descLower = (p.description || '').toLowerCase();
+        const catLower = (p.category || '').toLowerCase();
+
+        // Fuzzy-ish matching: check name, description, and category
+        const matchesSearch = nameLower.includes(searchLower) ||
+            descLower.includes(searchLower) ||
+            catLower.includes(searchLower) ||
+            // Split search by words for more flexibility
+            searchLower.split(' ').every(word =>
+                nameLower.includes(word) || descLower.includes(word)
+            );
+
         return matchesCategory && matchesSearch;
     });
 
@@ -156,7 +208,7 @@ function CatalogContent() {
                         >
                             Todos
                         </button>
-                        {CATEGORIES.map((cat) => (
+                        {categories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => toggleCategory(cat)}
@@ -187,7 +239,7 @@ function CatalogContent() {
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-widest text-primary/40 mb-4">Categorías</h3>
                         <div className="space-y-2">
-                            {CATEGORIES.map((cat) => (
+                            {categories.map((cat: string) => (
                                 <label key={cat} className="flex items-center gap-3 group cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -249,8 +301,21 @@ function CatalogContent() {
                         </div>
                     )}
 
-                    {/* Grid / List */}
-                    {paginatedProducts.length > 0 ? (
+                    {/* Grid / List / Skeletons */}
+                    {loading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="bg-white rounded-xl p-3 space-y-4 animate-pulse border border-primary/5">
+                                    <div className="aspect-[4/5] bg-primary/5 rounded-xl" />
+                                    <div className="space-y-2">
+                                        <div className="h-4 bg-primary/10 rounded w-3/4" />
+                                        <div className="h-3 bg-primary/5 rounded w-1/2" />
+                                        <div className="h-6 bg-primary/10 rounded w-1/3 mt-4" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : paginatedProducts.length > 0 ? (
                         <div className={cn(
                             viewMode === 'grid'
                                 ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6"
@@ -261,9 +326,18 @@ function CatalogContent() {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-20 bg-primary/5 rounded-3xl">
+                        <div className="text-center py-20 bg-primary/5 rounded-3xl animate-in fade-in duration-500">
                             <p className="text-xl font-bold text-primary/50">No se encontraron productos en esta categoría.</p>
-                            <button onClick={() => setSelectedCategories([])} className="mt-4 text-primary font-bold underline">Limpiar filtros</button>
+                            <button
+                                onClick={() => {
+                                    setSelectedCategories([]);
+                                    setSearchTerm('');
+                                    router.push('/catalog');
+                                }}
+                                className="mt-4 text-primary font-bold underline hover:text-primary-dark transition-colors"
+                            >
+                                Limpiar todos los filtros y búsqueda
+                            </button>
                         </div>
                     )}
 
