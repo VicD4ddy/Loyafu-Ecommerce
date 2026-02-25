@@ -9,7 +9,7 @@ export default function Newsletter() {
                 {/* Background Decorations */}
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none select-none overflow-hidden">
                     <span className="absolute top-10 -left-10 text-[120px] font-brand font-black italic whitespace-nowrap rotate-12">
-                        LOYAFU BEAUTY LOYAFU BEAUTY
+                        LOYAFU LOYAFU LOYAFU
                     </span>
                     <span className="absolute bottom-10 -right-10 text-[120px] font-brand font-black italic whitespace-nowrap -rotate-12">
                         TU MEJOR VERSION TU MEJOR VERSION

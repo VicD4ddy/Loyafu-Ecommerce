@@ -9,11 +9,13 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, useRef } from 'react';
 
+
 export default function ProductModal() {
     const { isOpen, selectedProduct, closeModal } = useProductModalStore();
     const addToCart = useCartStore((state) => state.addItem);
     const currency = useCartStore((state) => state.currency);
     const exchangeRate = useCartStore((state) => state.exchangeRate);
+
 
     // Safety check: hooks need to be called unconditionally, but logic depends on selectedProduct
     const [isFavorite, setIsFavorite] = useState(false);
@@ -101,6 +103,8 @@ export default function ProductModal() {
         toggleFavoriteStore(selectedProduct);
         setIsFavorite(!isFavorite); // Optimistic update
     };
+
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
@@ -274,13 +278,13 @@ export default function ProductModal() {
                         </div>
 
                         {/* Bottom Sticky Action Bar */}
-                        <div className="p-6 md:p-8 bg-white/80 backdrop-blur-xl border-t border-slate-100 mt-auto">
+                        <div className="p-6 md:p-8 bg-white/80 backdrop-blur-xl border-t border-slate-100 mt-auto space-y-4">
                             <div className="flex gap-4">
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={selectedProduct.description?.toLowerCase().includes('agotado')}
                                     className={cn(
-                                        "flex-1 relative py-4 rounded-2xl font-black text-[13px] tracking-[0.15em] uppercase flex items-center justify-center gap-3 transition-all active:scale-[0.98]",
+                                        "flex-1 relative py-4 rounded-2xl font-black text-[11px] tracking-widest uppercase flex items-center justify-center gap-2 transition-all active:scale-[0.98]",
                                         addedToCart
                                             ? "bg-green-500 text-white shadow-lg shadow-green-500/20"
                                             : "bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-white shadow-xl shadow-primary/30 border-b-4 border-primary-dark/30 hover:brightness-110"
@@ -289,29 +293,19 @@ export default function ProductModal() {
                                     {addedToCart ? (
                                         <>
                                             <Check className="w-5 h-5 animate-in zoom-in" />
-                                            Agregado
+                                            ¡Listo!
                                         </>
                                     ) : (
                                         <>
                                             <ShoppingBag className="w-5 h-5" />
-                                            Agregar al Carrito
+                                            Agregar
                                         </>
                                     )}
                                 </button>
 
-                                <button
-                                    onClick={handleToggleFavorite}
-                                    className={cn(
-                                        "w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.98]",
-                                        isFavorite
-                                            ? "border-red-500 bg-red-50 text-red-500"
-                                            : "border-slate-100 bg-slate-50 hover:border-primary/20 text-slate-400 shadow-sm"
-                                    )}
-                                >
-                                    <Heart className={cn("w-6 h-6", isFavorite && "fill-current")} />
-                                </button>
                             </div>
-                            <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-4">
+
+                            <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
                                 Eleva tu belleza • Calidad Premium
                             </p>
                         </div>

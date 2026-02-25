@@ -178,7 +178,7 @@ export default function InstagramFeed() {
 
                             {/* Bio Info with exact icons */}
                             <div className="text-[14px] md:text-[16px] text-background-dark leading-snug space-y-1">
-                                <p className="font-extrabold mb-1">Loyafu Beauty | Makeup & Skincare</p>
+                                <p className="font-extrabold mb-1">Loyafu | Makeup & Skincare</p>
                                 <p className="font-medium flex items-center justify-center md:justify-start gap-2">✨ Tu mejor versión empieza aquí</p>
                                 <p className="font-medium flex items-center justify-center md:justify-start gap-2">🌿 Cosmética premium y en tendencia</p>
                                 <p className="font-medium flex items-center justify-center md:justify-start gap-2">📦 Envíos a todo el país</p>

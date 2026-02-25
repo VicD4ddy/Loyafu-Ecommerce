@@ -11,6 +11,7 @@ interface Testimonial {
     text: string;
     rating: number;
     badge: string;
+    created_at: string;
 }
 
 export default function Testimonials() {
@@ -24,7 +25,8 @@ export default function Testimonials() {
     const [formData, setFormData] = useState({
         name: '',
         text: '',
-        rating: 5
+        rating: 5,
+        badge: 'Cliente'
     });
 
     useEffect(() => {
@@ -37,7 +39,8 @@ export default function Testimonials() {
             .from('testimonials')
             .select('*')
             .eq('is_approved', true)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(8);
 
         if (error) {
             console.error('Error fetching testimonials:', error);
@@ -64,7 +67,7 @@ export default function Testimonials() {
             alert('Hubo un error al enviar tu testimonio.');
         } else {
             alert('¡Gracias! Tu testimonio ha sido enviado y aparecerá cuando el administrador lo apruebe.');
-            setFormData({ name: '', text: '', rating: 5 });
+            setFormData({ name: '', text: '', rating: 5, badge: 'Cliente' });
             setIsModalOpen(false);
         }
         setIsSubmitting(false);
@@ -99,48 +102,75 @@ export default function Testimonials() {
                     </button>
                 </div>
 
-                {/* Testimonial Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {loading ? (
-                        Array(4).fill(0).map((_, i) => (
-                            <div key={i} className="h-64 bg-slate-50 rounded-[2.5rem] animate-pulse" />
-                        ))
-                    ) : testimonials.length > 0 ? (
-                        testimonials.map((t) => (
-                            <div
-                                key={t.id}
-                                className="group relative bg-white rounded-[2.5rem] p-8 shadow-xl shadow-primary/5 border border-primary/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20"
-                            >
-                                <div className="absolute -top-px -left-px w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-tl-[2.5rem]"></div>
+                {/* Testimonial Container - Adjusted for Mobile Horizontal Scroll */}
+                <div className="relative">
+                    <div
+                        className={cn(
+                            "flex overflow-x-auto snap-x snap-mandatory scrollbar-none pb-8 gap-6 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:pb-0 md:gap-8",
+                            loading ? "opacity-50" : "opacity-100"
+                        )}
+                    >
+                        {loading ? (
+                            Array(4).fill(0).map((_, i) => (
+                                <div key={i} className="min-w-[calc(100vw-3rem)] md:min-w-0 h-64 bg-slate-50 rounded-[2.5rem] animate-pulse" />
+                            ))
+                        ) : testimonials.length > 0 ? (
+                            testimonials.map((t) => (
+                                <div
+                                    key={t.id}
+                                    className="group relative bg-white rounded-[2.5rem] p-8 shadow-xl shadow-primary/5 border border-primary/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 w-[calc(100vw-3rem)] md:w-full md:min-w-0 flex-shrink-0 snap-center"
+                                >
+                                    <div className="absolute -top-px -left-px w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-tl-[2.5rem]"></div>
 
-                                <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                                    <Quote className="w-6 h-6 fill-current" />
-                                </div>
+                                    <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                                        <Quote className="w-6 h-6 fill-current" />
+                                    </div>
 
-                                <p className="text-slate-600 text-[14px] leading-relaxed mb-8 font-medium italic min-h-[80px]">
-                                    &ldquo;{t.text}&rdquo;
-                                </p>
+                                    <p className="text-slate-600 text-[14px] leading-relaxed mb-6 font-medium italic min-h-[80px]">
+                                        &ldquo;{t.text}&rdquo;
+                                    </p>
 
-                                <div className="pt-6 border-t border-primary/5 flex items-end justify-between">
-                                    <div className="space-y-1">
-                                        <div className="flex gap-0.5 mb-2">
-                                            {[...Array(t.rating)].map((_, j) => (
-                                                <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-current" />
-                                            ))}
+                                    <div className="pt-6 border-t border-primary/5">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex gap-0.5">
+                                                {[...Array(t.rating)].map((_, j) => (
+                                                    <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-current" />
+                                                ))}
+                                            </div>
+                                            <span className="text-[10px] font-bold text-slate-400">
+                                                {new Date(t.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                            </span>
                                         </div>
-                                        <p className="font-black text-background-dark text-sm uppercase tracking-tight">{t.name}</p>
-                                        <span className="text-[10px] font-black text-primary/40 uppercase tracking-widest">{t.badge}</span>
-                                    </div>
-                                    <div className="w-10 h-10 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center">
-                                        <MessageCircle className="w-5 h-5 mb-0.5" />
+
+                                        <div className="flex items-end justify-between">
+                                            <div className="space-y-1">
+                                                <p className="font-black text-background-dark text-sm uppercase tracking-tight">{t.name}</p>
+                                                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-primary/5 border border-primary/10 rounded-md">
+                                                    <Sparkles className="w-2.5 h-2.5 text-primary" />
+                                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t.badge || 'Cliente'}</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-10 h-10 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center">
+                                                <MessageCircle className="w-5 h-5 mb-0.5" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="w-full py-20 bg-slate-50 rounded-[3rem] text-center flex-shrink-0">
+                                <MessageCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                                <p className="text-slate-500 font-bold">¡Sé el primero en dejar un testimonio!</p>
                             </div>
-                        ))
-                    ) : (
-                        <div className="col-span-full py-20 bg-slate-50 rounded-[3rem] text-center">
-                            <MessageCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <p className="text-slate-500 font-bold">¡Sé el primero en dejar un testimonio!</p>
+                        )}
+                    </div>
+
+                    {/* Mobile Hint - Only visible on small screens when multiple items exist */}
+                    {!loading && testimonials.length > 1 && (
+                        <div className="md:hidden flex justify-center mt-2 pointer-events-none">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/30 animate-pulse">
+                                Desliza para ver más
+                            </span>
                         </div>
                     )}
                 </div>
@@ -152,9 +182,8 @@ export default function Testimonials() {
                     <div className="absolute inset-0 bg-background-dark/60 backdrop-blur-md" onClick={() => !isSubmitting && setIsModalOpen(false)} />
 
                     <div className="relative w-full max-w-xl bg-white rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-10 duration-500 max-h-[95vh] flex flex-col">
-                        {/* Modal Header - Refined with Gradient & Pattern */}
+                        {/* Modal Header */}
                         <div className="bg-gradient-to-br from-[#9d33f7] to-[#8c2bee] p-8 md:p-10 text-white relative flex-shrink-0">
-                            {/* Decorative element */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                             <button
@@ -177,7 +206,7 @@ export default function Testimonials() {
                             </div>
                         </div>
 
-                        {/* Modal Form - Scrollable for small screens */}
+                        {/* Modal Form */}
                         <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-8 overflow-y-auto flex-1 scrollbar-none">
                             <div className="space-y-3">
                                 <div className="flex items-center gap-2 ml-2">
@@ -192,6 +221,30 @@ export default function Testimonials() {
                                     className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-5 px-6 focus:outline-none focus:border-primary/50 text-background-dark font-bold text-sm shadow-inner transition-all"
                                     placeholder="Nombre completo"
                                 />
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 ml-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">¿Qué tipo de cliente eres?</label>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {['Cliente', 'Cliente Fiel', 'Emprendedora'].map((cat) => (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, badge: cat })}
+                                            className={cn(
+                                                "py-3 px-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
+                                                formData.badge === cat
+                                                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105"
+                                                    : "bg-slate-50 text-slate-400 border-slate-100 hover:border-primary/30"
+                                            )}
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="space-y-4">
@@ -233,7 +286,6 @@ export default function Testimonials() {
                                 />
                             </div>
 
-                            {/* Push down spacing for final button on mobile */}
                             <div className="pt-4 pb-8 sm:pb-0">
                                 <button
                                     type="submit"

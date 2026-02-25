@@ -14,7 +14,8 @@ import {
     X,
     LayoutGrid,
     MessageSquare,
-    MessageCircle
+    MessageCircle,
+    Zap
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
         { label: 'Productos', href: '/admin/products', icon: Package },
+        { label: 'Combos', href: '/admin/products?category=Combos', icon: Zap },
         { label: 'Categorías', href: '/admin/categories', icon: LayoutGrid },
         { label: 'Testimonios', href: '/admin/testimonials', icon: MessageCircle },
         { label: 'Producto Semana', href: '/admin/featured', icon: Star },

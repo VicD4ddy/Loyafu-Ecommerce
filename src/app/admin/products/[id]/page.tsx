@@ -103,6 +103,44 @@ export default function EditProductPage() {
         setColors(colors.filter(c => c !== color));
     };
 
+    const compressImage = (file: File): Promise<Blob> => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new (window as any).Image();
+                img.src = event.target?.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1000;
+                    const MAX_HEIGHT = 1000;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        resolve(blob || file);
+                    }, 'image/jpeg', 0.85);
+                };
+            };
+        });
+    };
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
@@ -112,13 +150,16 @@ export default function EditProductPage() {
         try {
             // 1. Upload new image if selected
             if (imageFile) {
-                const fileExt = imageFile.name.split('.').pop();
+                const compressedBlob = await compressImage(imageFile);
+                const fileExt = 'jpg';
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
                 const filePath = `products/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
                     .from('product-images')
-                    .upload(filePath, imageFile);
+                    .upload(filePath, compressedBlob, {
+                        contentType: 'image/jpeg'
+                    });
 
                 if (uploadError) throw uploadError;
 
@@ -331,6 +372,7 @@ export default function EditProductPage() {
                                         <option value="Ushas">Ushas</option>
                                         <option value="Brochas">Brochas</option>
                                         <option value="Cuidado Del Cabello">Cuidado Del Cabello</option>
+                                        <option value="Combos">Combos (Especiales)</option>
                                         <option value="Otros">Otros</option>
                                     </select>
                                 </div>

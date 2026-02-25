@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Instagram, MessageCircle, Banknote, Smartphone, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
-import Logo from '@/components/ui/Logo';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/context/SettingsContext';
 
@@ -28,22 +27,27 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-12 gap-12 md:gap-8">
                     {/* Brand Column */}
-                    <div className="col-span-2 md:col-span-4 space-y-8">
-                        <div className="flex items-center gap-3 group cursor-default">
-                            <div className="w-12 h-12 relative transition-transform duration-500 group-hover:rotate-[360deg]">
-                                <Logo className="w-full h-full text-primary" />
+                    <div className="col-span-2 md:col-span-4 space-y-8 flex flex-col items-center md:items-start">
+                        <Link href="/" className="flex flex-col items-center md:items-start group">
+                            <div className="relative w-32 h-16 md:w-64 md:h-20 transition-transform duration-500 group-hover:scale-105">
+                                <Image
+                                    src="/assets/brand/logo-main.png"
+                                    alt="Loyafu Logo"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                />
                             </div>
-                            <span className="font-brand font-black text-2xl tracking-tighter text-background-dark italic">LOYAFU</span>
-                        </div>
+                        </Link>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 flex flex-col items-center md:items-start text-center md:text-left">
                             <h4 className="text-sm font-black uppercase tracking-[0.2em] text-background-dark">Nuestra Historia</h4>
                             <p className="text-primary/60 text-sm font-medium leading-relaxed max-w-xs text-balance">
                                 Nacimos para potenciar tu viaje de belleza con productos que celebran quién eres. Cosmética premium, ética y en tendencia para la mujer de hoy.
                             </p>
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 justify-center md:justify-start">
                             <Link
                                 href="https://www.instagram.com/loyafu.ve/"
                                 target="_blank"
@@ -115,7 +119,7 @@ export default function Footer() {
                 {/* Bottom Bar */}
                 <div className="mt-16 pt-8 border-t border-primary/5 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex flex-col md:flex-row items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-primary/30">
-                        <p>© {new Date().getFullYear()} LOYAFU BEAUTY.</p>
+                        <p>© {new Date().getFullYear()} LOYAFU.</p>
                         <div className="hidden md:block w-1 h-1 bg-primary/20 rounded-full"></div>
                         <div className="flex gap-6">
                             <Link href="/policies" className="hover:text-primary transition-colors">Privacidad</Link>

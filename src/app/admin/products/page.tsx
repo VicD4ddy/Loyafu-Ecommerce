@@ -24,11 +24,16 @@ export default function AdminProductsPage() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
     useEffect(() => {
+        // Listen for category in URL
+        const params = new URLSearchParams(window.location.search);
+        const cat = params.get('category');
+        if (cat) setSelectedCategory(cat);
         fetchProducts();
-    }, []);
+    }, [window.location.search]);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -65,10 +70,12 @@ export default function AdminProductsPage() {
         setDeletingId(null);
     };
 
-    const filteredProducts = products.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredProducts = products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory ? p.category === selectedCategory : true;
+        return matchesSearch && matchesCategory;
+    });
 
     if (loading) {
         return (

@@ -108,7 +108,7 @@ export default async function Home() {
                 key={`${cat}-${i}`}
                 className="flex-shrink-0 text-2xl md:text-5xl font-black text-primary/40 uppercase italic font-brand tracking-widest"
               >
-                {cat === 'Otros' ? 'y mucho más' : cat}
+                {cat}
               </span>
             ))}
           </div>
@@ -198,7 +198,7 @@ export default async function Home() {
             </div>
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase font-brand italic leading-[0.85] text-white">
               EMPRENDE CON <br className="md:hidden" />
-              <span className="text-primary">LOYAFU BEAUTY</span>
+              <span className="text-primary">LOYAFU</span>
             </h2>
             <p className="text-slate-300 text-lg leading-relaxed">
               Ofrecemos márgenes de ganancia competitivos para que inicies o hagas crecer tu negocio de maquillaje. Sin montos mínimos de compra global, solo mínimos por producto.

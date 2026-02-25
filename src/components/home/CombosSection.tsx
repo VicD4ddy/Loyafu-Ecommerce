@@ -1,9 +1,44 @@
-import { Sparkles } from 'lucide-react';
+"use client";
+
+import { Sparkles, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
-import { PRODUCTS } from '@/data/products';
+import { useEffect, useState } from 'react';
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser';
 
 export default function CombosSection() {
-    const combos = PRODUCTS.filter(p => p.category === 'Combos');
+    const [combos, setCombos] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const supabase = createSupabaseBrowserClient();
+
+    useEffect(() => {
+        async function fetchCombos() {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq('category', 'Combos')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching combos:', error);
+            } else {
+                // Map database fields to application fields if necessary
+                const mappedData = data?.map((p: any) => ({
+                    ...p,
+                    priceUSD: p.price_usd,
+                    wholesalePrice: p.wholesale_price,
+                    wholesaleMin: p.wholesale_min,
+                    image: p.image_url
+                })) || [];
+                setCombos(mappedData);
+            }
+            setLoading(false);
+        }
+
+        fetchCombos();
+    }, [supabase]);
+
+    if (!loading && combos.length === 0) return null;
 
     return (
         <section id="promociones" className="py-8 md:py-20 px-6 bg-gradient-to-b from-white to-primary/5">
@@ -20,13 +55,20 @@ export default function CombosSection() {
                         Inicia tu negocio con nuestros paquetes todo-en-uno. ¡Máxima rentabilidad asegurada!
                     </p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 justify-center">
-                    {combos.map((product) => (
-                        <div key={product.id} className="transform hover:-translate-y-2 transition-transform duration-300">
-                            <ProductCard product={product} />
-                        </div>
-                    ))}
-                </div>
+
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 justify-center">
+                        {combos.map((product) => (
+                            <div key={product.id} className="transform hover:-translate-y-2 transition-transform duration-300">
+                                <ProductCard product={product} />
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 <div className="mt-12 text-center">
                     <p className="text-sm text-slate-400 italic">
