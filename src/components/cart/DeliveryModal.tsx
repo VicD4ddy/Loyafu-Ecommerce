@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, MapPin, AlertCircle, Send, Package, Mail, Building, Map } from 'lucide-react';
+import { X, MapPin, AlertCircle, Send, Package, Mail, Building, Map, MessageCircle } from 'lucide-react';
 import { DeliveryDetails, DeliveryMethod } from '@/store/useCartStore';
 
 interface DeliveryModalProps {
@@ -311,10 +311,10 @@ export function DeliveryModal({ isOpen, deliveryMethod, onClose, onConfirm, init
                     <button
                         type="submit"
                         form="delivery-form"
-                        className="w-2/3 bg-primary text-white px-4 py-3.5 sm:py-4 rounded-xl text-[11px] sm:text-xs font-black uppercase tracking-widest shadow-[0_8px_16px_rgba(157,51,247,0.3)] flex items-center justify-center gap-2 hover:bg-primary-dark transition-all active:scale-95"
+                        className="w-2/3 bg-[#25D366] text-white px-4 py-3.5 sm:py-4 rounded-xl text-[11px] sm:text-xs font-black uppercase tracking-widest shadow-[0_8px_16px_rgba(37,211,102,0.3)] flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95"
                     >
-                        Confirmar Envío
-                        <Send className="w-3.5 h-3.5" />
+                        Pagar por WhatsApp
+                        <MessageCircle className="w-4 h-4" />
                     </button>
                 </div>
             </div>

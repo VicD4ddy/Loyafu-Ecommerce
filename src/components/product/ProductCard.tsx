@@ -179,8 +179,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                     )} />
                 </button>
 
-                {/* Quick Add Button — Refined & Professional */}
-                <div className="absolute bottom-3 right-3 z-30">
+                {/* Quick Add Button — Mobile Only */}
+                <div className="absolute bottom-3 right-3 z-30 md:hidden">
                     <button
                         onClick={handleAddToCart}
                         disabled={badge === 'agotado'}
@@ -208,7 +208,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                         className="w-full bg-primary/95 backdrop-blur-md text-white font-bold py-2.5 rounded-xl shadow-xl flex items-center justify-center gap-2 hover:bg-primary transition-colors"
                     >
                         <ShoppingCart className="w-4 h-4" />
-                        {badge === 'agotado' ? 'Agotado' : 'Agregar'}
+                        {badge === 'agotado' ? 'Agotado' : 'Agrega'}
                     </button>
                 </div>
             </div>

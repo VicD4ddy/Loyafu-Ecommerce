@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, Truck, ArrowRight, ShieldCheck, Leaf, MessageCircle, ShoppingBag, Percent, Heart, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, Trash2, Truck, ArrowRight, ShieldCheck, MessageCircle, ShoppingBag, Heart, ShoppingCart, Store, PackageCheck, Smartphone, Banknote, Bitcoin } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -37,9 +37,7 @@ export default function Cart() {
     if (!mounted) return null;
 
     const subtotalUSD = getTotal();
-    const hasDiscount = isNationalShipping
-        ? (paymentMethod === 'binance' || paymentMethod === 'pago_movil')
-        : (paymentMethod === 'binance' || paymentMethod === 'divisa');
+    const hasDiscount = paymentMethod === 'binance' || paymentMethod === 'divisa';
     const discountAmount = hasDiscount ? subtotalUSD * 0.25 : 0;
     const totalUSD = subtotalUSD - discountAmount;
 
@@ -134,20 +132,25 @@ export default function Cart() {
 
     if (items.length === 0) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6 animate-in fade-in zoom-in-95 duration-700">
-                <div className="relative mb-8">
-                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-                    <div className="relative w-32 h-32 bg-white/50 backdrop-blur-xl border border-primary/20 rounded-full flex items-center justify-center shadow-2xl">
-                        <ShoppingBag className="w-12 h-12 text-primary/60" />
+            <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6 animate-in fade-in zoom-in-95 duration-1000">
+                <div className="relative mb-12">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+                    <div className="relative w-40 h-40 bg-white/40 backdrop-blur-3xl border border-white/20 rounded-full flex items-center justify-center shadow-[0_20px_60px_-15px_rgba(140,43,238,0.3)]">
+                        <ShoppingBag className="w-16 h-16 text-primary/40 stroke-[1.5]" />
                     </div>
                 </div>
-                <h1 className="text-4xl font-black text-background-dark mb-4 tracking-tighter uppercase italic">Tu bolsa está vacía</h1>
+                <h1 className="text-5xl md:text-7xl font-black text-background-dark mb-6 tracking-tighter uppercase italic font-brand leading-none">
+                    Tu bolsa está <span className="text-primary/40">vacía</span>
+                </h1>
+                <p className="text-slate-500 max-w-sm mb-10 font-medium leading-relaxed">
+                    Parece que aún no has añadido nada a tu selección. ¡Explora nuestras colecciones exclusivas ahora!
+                </p>
                 <Link
                     href="/catalog"
-                    className="group bg-background-dark text-white px-10 py-4 rounded-full font-bold shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
+                    className="group bg-background-dark text-white px-12 py-5 rounded-full font-bold shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4 hover:shadow-primary/20"
                 >
                     Explorar Catálogo
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-primary" />
                 </Link>
             </div>
         );
@@ -160,7 +163,7 @@ export default function Cart() {
                 {/* Left Column: Cart items & Suggested */}
                 <div className="flex-1 space-y-10">
                     <div className="space-y-4">
-                        <h1 className="text-4xl font-black text-background-dark tracking-tighter uppercase italic">Mi Bolsa</h1>
+                        <h1 className="text-5xl md:text-6xl font-black text-background-dark tracking-tighter uppercase italic font-brand leading-[0.85]">Mi <span className="text-primary">Bolsa</span></h1>
 
                         {/* Cart Items */}
                         <div className="space-y-4">
@@ -173,7 +176,7 @@ export default function Cart() {
                                 return (
                                     <div
                                         key={`${item.id}-${item.selectedColor || 'none'}`}
-                                        className="group bg-white p-4 rounded-[2rem] flex flex-row items-center gap-4 border border-primary/5 hover:border-primary/20 transition-all duration-300 shadow-sm"
+                                        className="group bg-white p-5 rounded-[1.5rem] flex flex-row items-center gap-6 border border-primary/5 hover:border-primary/20 transition-all duration-500 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(140,43,238,0.1)] hover:-translate-y-0.5"
                                     >
                                         <div
                                             className="relative w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-slate-50 cursor-pointer"
@@ -183,7 +186,7 @@ export default function Cart() {
                                         </div>
 
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-black text-sm md:text-lg text-background-dark truncate">{item.name}</h3>
+                                            <h3 className="font-black text-base md:text-xl text-background-dark truncate font-brand italic tracking-tight">{item.name}</h3>
                                             <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{item.category}</p>
 
                                             {/* Visual Progress Bar for Wholesale Incentive */}
@@ -229,23 +232,27 @@ export default function Cart() {
                     </div>
 
                     {/* Cross-selling Section */}
-                    <div className="pt-8 border-t border-slate-100">
-                        <div className="flex items-center gap-3 mb-6">
-                            <ShoppingCart className="w-5 h-5 text-primary" />
-                            <h2 className="text-xl font-black text-background-dark tracking-tighter uppercase italic">Completa tu Look</h2>
+                    <div className="pt-12 border-t border-slate-100">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2 bg-primary/10 rounded-xl">
+                                    <ShoppingCart className="w-5 h-5 text-primary" />
+                                </div>
+                                <h2 className="text-2xl font-black text-background-dark tracking-tighter uppercase italic font-brand">Completa tu <span className="text-primary">Look</span></h2>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             {suggestedProducts.map(product => (
                                 <div
                                     key={product.id}
                                     onClick={() => openModal(product)}
-                                    className="group bg-slate-50 p-3 rounded-3xl border border-transparent hover:border-primary/20 hover:bg-white transition-all cursor-pointer"
+                                    className="group bg-white p-4 rounded-[1.5rem] border border-transparent hover:border-primary/10 hover:shadow-[0_10px_30px_-15px_rgba(140,43,238,0.15)] transition-all cursor-pointer text-center"
                                 >
-                                    <div className="relative aspect-square rounded-2xl overflow-hidden mb-3">
-                                        <Image src={product.image} fill className="object-cover group-hover:scale-110 transition-transform duration-500" alt={product.name} />
+                                    <div className="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-slate-50">
+                                        <Image src={product.image} fill className="object-cover group-hover:scale-110 transition-transform duration-700" alt={product.name} />
                                     </div>
-                                    <h4 className="text-[10px] font-black text-background-dark truncate leading-tight mb-1">{product.name}</h4>
-                                    <p className="text-[11px] font-black text-primary">${product.priceUSD}</p>
+                                    <h4 className="text-xs font-bold text-background-dark truncate leading-tight mb-1 group-hover:text-primary transition-colors">{product.name}</h4>
+                                    <p className="text-sm font-black text-primary">${product.priceUSD}</p>
                                 </div>
                             ))}
                         </div>
@@ -253,12 +260,16 @@ export default function Cart() {
                 </div>
 
                 {/* Right Column: Checkout Summary (Desktop Only) */}
-                <div className="lg:w-[400px]">
-                    <div className="bg-[#18131e] text-white rounded-[2.5rem] p-8 shadow-2xl sticky top-28 space-y-8 overflow-hidden">
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-[80px]" />
+                <div className="lg:w-[420px]">
+                    <div className="bg-[#120d18] text-white rounded-[2rem] p-8 shadow-[0_30px_100px_-20px_rgba(140,43,238,0.2)] sticky top-28 space-y-8 overflow-hidden border border-white/5 backdrop-blur-3xl">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32 animate-pulse" />
+                        <div className="absolute bottom-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-[80px] -ml-20 -mb-20" />
 
                         <div className="relative space-y-6">
-                            <h3 className="text-xl font-black italic tracking-tighter uppercase">Resumen</h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-2xl font-black italic tracking-tighter uppercase font-brand">Resumen</h3>
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 bg-white/5 px-3 py-1 rounded-full border border-white/5">{items.length} {items.length === 1 ? 'producto' : 'productos'}</span>
+                            </div>
 
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center text-slate-400">
@@ -267,61 +278,126 @@ export default function Cart() {
                                 </div>
 
                                 {/* Delivery Selector */}
-                                <div className="space-y-3">
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">Método de Entrega</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['pickup', 'local_delivery', 'national_shipping'].map(m => (
-                                            <button
-                                                key={m}
-                                                onClick={() => setDeliveryMethod(m as any)}
-                                                className={cn(
-                                                    "px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-tight transition-all",
-                                                    deliveryMethod === m ? "bg-primary text-white" : "bg-white/5 text-slate-400"
-                                                )}
-                                            >
-                                                {m === 'pickup' ? 'Tienda' : m === 'local_delivery' ? 'Delivery' : 'Nacional'}
-                                            </button>
-                                        ))}
+                                <div className="space-y-2">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Método de Entrega</p>
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {[
+                                            { id: 'pickup', label: 'Tienda', icon: Store },
+                                            { id: 'local_delivery', label: 'Delivery', icon: Truck },
+                                            { id: 'national_shipping', label: 'Envío Nacional', icon: PackageCheck }
+                                        ].map(m => {
+                                            const Icon = m.icon;
+                                            const active = deliveryMethod === m.id;
+                                            return (
+                                                <button
+                                                    key={m.id}
+                                                    onClick={() => setDeliveryMethod(m.id as any)}
+                                                    className={cn(
+                                                        "flex flex-col items-center gap-1.5 px-2 py-3 rounded-2xl text-[8px] font-black uppercase tracking-tight transition-all duration-300 border",
+                                                        active
+                                                            ? "bg-primary/20 text-primary border-primary/40 shadow-[0_0_20px_-5px_rgba(140,43,238,0.5)]"
+                                                            : "bg-white/5 text-slate-500 border-white/5 hover:bg-white/10 hover:text-slate-300"
+                                                    )}
+                                                >
+                                                    <Icon className={cn("w-4 h-4", active ? "text-primary" : "text-slate-500")} />
+                                                    {m.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Payment Selector */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Método de Pago</p>
+                                        {hasDiscount && <span className="text-[8px] font-black text-green-400 animate-pulse">✦ 25% desc. activo</span>}
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {[
+                                            { id: 'pago_movil', label: 'Pago Móvil', icon: Smartphone, discount: false },
+                                            { id: 'divisa', label: 'Efectivo', icon: Banknote, discount: true },
+                                            { id: 'binance', label: 'Binance', icon: Bitcoin, discount: true }
+                                        ].map(p => {
+                                            const Icon = p.icon;
+                                            const active = paymentMethod === p.id;
+                                            return (
+                                                <button
+                                                    key={p.id}
+                                                    onClick={() => setPaymentMethod(p.id as any)}
+                                                    className={cn(
+                                                        "relative flex flex-col items-center gap-1.5 px-2 py-3 rounded-2xl text-[8px] font-black uppercase tracking-tight transition-all duration-300 border overflow-hidden",
+                                                        active && p.discount
+                                                            ? "bg-green-500/20 text-green-400 border-green-500/40 shadow-[0_0_20px_-5px_rgba(34,197,94,0.5)]"
+                                                            : active
+                                                                ? "bg-primary/20 text-primary border-primary/40 shadow-[0_0_20px_-5px_rgba(140,43,238,0.5)]"
+                                                                : "bg-white/5 text-slate-500 border-white/5 hover:bg-white/10 hover:text-slate-300"
+                                                    )}
+                                                >
+                                                    {p.discount && <span className="absolute top-1 right-1 text-[7px] font-black text-green-400 leading-none">-25%</span>}
+                                                    <Icon className={cn("w-4 h-4", active && p.discount ? "text-green-400" : active ? "text-primary" : "text-slate-500")} />
+                                                    {p.label}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
 
                                 {/* Total */}
-                                <div className="pt-6 border-t border-white/10 flex justify-between items-end">
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-500 mb-1">Total</p>
-                                        <div className="text-4xl font-black tracking-tighter">
+                                <div className="pt-8 border-t border-white/10 flex justify-between items-end relative z-10">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Total Final</p>
+                                        <div className="text-5xl font-black tracking-tighter font-brand italic text-white">
                                             {currency === 'USD' ? `$${totalUSD.toFixed(2)}` : `${totalBs.toFixed(2)} Bs`}
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        {hasDiscount && <span className="text-green-400 text-[10px] font-black block mb-1">Ahorraste 25%</span>}
-                                        <span className="text-slate-400 font-bold text-xs">{currency === 'USD' ? `${totalBs.toFixed(2)} Bs` : `$${totalUSD.toFixed(2)}`}</span>
+                                    <div className="text-right pb-1">
+                                        {hasDiscount && <span className="bg-green-500/20 text-green-400 text-[9px] font-black px-2 py-0.5 rounded-full block mb-2 border border-green-500/30">25% OFF APLICADO</span>}
+                                        <span className="text-slate-500 font-bold text-xs tabular-nums">{currency === 'USD' ? `${totalBs.toFixed(2)} Bs` : `$${totalUSD.toFixed(2)}`}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Trust Elements */}
-                            <div className="grid grid-cols-3 gap-2 py-6 border-y border-white/5">
-                                <div className="flex flex-col items-center text-center gap-1 opacity-60">
-                                    <ShieldCheck className="w-5 h-5 text-green-400" />
-                                    <span className="text-[8px] font-black uppercase">Seguro</span>
+                            <div className="grid grid-cols-3 gap-4 py-8 border-y border-white/5 relative z-10">
+                                <div className="flex flex-col items-center text-center gap-2 group/trust">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/trust:bg-green-500/20 transition-colors duration-500">
+                                        <ShieldCheck className="w-5 h-5 text-green-400" />
+                                    </div>
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Seguro</span>
                                 </div>
-                                <div className="flex flex-col items-center text-center gap-1 opacity-60">
-                                    <Truck className="w-5 h-5 text-primary" />
-                                    <span className="text-[8px] font-black uppercase">Rápido</span>
+                                <div className="flex flex-col items-center text-center gap-2 group/trust">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/trust:bg-primary/20 transition-colors duration-500">
+                                        <Truck className="w-5 h-5 text-primary" />
+                                    </div>
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Rápido</span>
                                 </div>
-                                <div className="flex flex-col items-center text-center gap-1 opacity-60">
-                                    <Heart className="w-5 h-5 text-amber-400" />
-                                    <span className="text-[8px] font-black uppercase">Original</span>
+                                <div className="flex flex-col items-center text-center gap-2 group/trust">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/trust:bg-amber-500/20 transition-colors duration-500">
+                                        <Heart className="w-5 h-5 text-amber-400" />
+                                    </div>
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Original</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleCheckout}
-                                className="w-full bg-[#25D366] text-white py-5 rounded-3xl font-black text-lg shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                className={cn(
+                                    "w-full py-5 rounded-3xl font-black text-lg shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3",
+                                    deliveryMethod === 'pickup' ? "bg-[#25D366] text-white" : "bg-primary text-white"
+                                )}
                             >
-                                Pagar por WhatsApp
-                                <MessageCircle className="w-6 h-6" />
+                                {deliveryMethod === 'pickup' ? (
+                                    <>
+                                        Pagar por WhatsApp
+                                        <MessageCircle className="w-6 h-6" />
+                                    </>
+                                ) : (
+                                    <>
+                                        Continuar
+                                        <ArrowRight className="w-6 h-6" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
