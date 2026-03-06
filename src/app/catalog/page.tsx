@@ -51,7 +51,7 @@ function CatalogContent() {
                 wholesalePrice: p.wholesale_price,
                 wholesaleMin: p.wholesale_min,
                 badge: p.badge, // Ensure badge is also passed if it exists
-                requiresAllTones: p.requires_all_tones
+                requiredTonesCount: p.required_tones_count
             }));
 
             setProducts(mappedProducts);

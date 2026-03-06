@@ -145,15 +145,15 @@ export default function NewProductPage() {
                     wholesale_price: formData.wholesale_price ? parseFloat(formData.wholesale_price) : null,
                     wholesale_min: formData.wholesale_min ? parseInt(formData.wholesale_min) : null,
                     colors: colors,
-                    requires_all_tones: requiresAllTones,
+                    required_tones_count: requiresAllTones ? colors.length : 0, // Fallback temporarily logic
                     updated_at: new Date().toISOString()
                 });
 
             if (insertError) throw insertError;
 
             showToast('¡Producto creado con éxito!');
-            router.push('/admin/products');
-            router.refresh();
+            router.refresh(); // Refresh current router data
+            router.push('/admin/products'); // Redirect to products list
         } catch (error: any) {
             console.error('Error saving product:', error);
             showToast(`Error: ${error.message || 'No se pudo guardar el producto'}`);
@@ -370,19 +370,26 @@ export default function NewProductPage() {
                                         />
                                     </div>
                                 </div>
-
-                                {/* Checkbox requiring all tones for wholesale discount */}
+                                {/* Exigir cantidad específica de tonos para descuento mayorista */}
                                 {colors.length > 1 && formData.wholesale_price && (
                                     <div className="pt-2">
-                                        <label className="flex items-center gap-2 text-sm text-slate-300 font-medium cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={requiresAllTones}
-                                                onChange={(e) => setRequiresAllTones(e.target.checked)}
-                                                className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer"
-                                            />
-                                            Exigir llevar UNO DE CADA TONO para aplicar descuento
-                                        </label>
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-sm text-slate-300 font-medium">
+                                                Variedad Min. de Tonos para Mayorista
+                                            </label>
+                                            <div className="flex items-center gap-3">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={requiresAllTones ? 1 : 0} // Temporally using old boolean code logic here for compatibility before state switch
+                                                    onChange={(e) => setRequiresAllTones(parseInt(e.target.value) > 0)}
+                                                    className="w-24 bg-[#251e30] border border-white/10 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-primary transition-all text-sm font-bold text-center"
+                                                />
+                                                <span className="text-[10px] text-slate-400">
+                                                    Ej: 3 (exigirá que el usuario lleve 3 colores diferentes). 0 = No exigir.
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>

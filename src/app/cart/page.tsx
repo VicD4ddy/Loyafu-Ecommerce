@@ -186,14 +186,42 @@ export default function Cart() {
                                 return items.map((item, index) => {
                                     const totalQtyForProduct = productTotalQty[item.id] || item.quantity;
 
-                                    // Evaluate specific rule: requires one of each tone
-                                    let hasAllTones = true;
-                                    if (item.requiresAllTones && item.colors && item.colors.length > 0) {
-                                        const tonesInCart = items.filter(i => i.id === item.id).map(i => i.selectedColor).filter(Boolean);
-                                        hasAllTones = item.colors.every(color => tonesInCart.includes(color));
+                                    // Evaluate specific rule: requires a certain number of varied tones
+                                    let meetsTonesVariety = true;
+                                    let uniqueTonesInCart = new Set<string>();
+
+                                    // Make sure it exists and uses it. If it doesn't exist, we fallback to true since it shouldn't hold back regular wholesale.
+                                    if (item.requiredTonesCount !== undefined && Number(item.requiredTonesCount) > 0) {
+                                        // Look at ALL items in the cart to count unique tones for THIS product ID
+                                        const tonesForThisProduct = items
+                                            .filter(i => i.id === item.id)
+                                            .map(i => i.selectedColor)
+                                            .filter(Boolean) as string[];
+                                        uniqueTonesInCart = new Set(tonesForThisProduct);
+                                        meetsTonesVariety = uniqueTonesInCart.size >= Number(item.requiredTonesCount);
+                                    } else if (item.requiredTonesCount === undefined) {
+                                        // Fallback just in case old state from localStorage persists and this item HAD the old rule
+                                        if ((item as any).requiresAllTones === true) {
+                                            meetsTonesVariety = false; // We can't know for sure the count, so enforce not to break prices temporarily before storage wipe.
+                                        }
                                     }
 
-                                    const isWholesale = !!(item.wholesalePrice && item.wholesaleMin && totalQtyForProduct >= item.wholesaleMin && hasAllTones);
+                                    const hasValidWholesalePrices = item.wholesalePrice !== undefined && item.wholesaleMin !== undefined;
+                                    const isWholesale = hasValidWholesalePrices && (totalQtyForProduct >= item.wholesaleMin!) && meetsTonesVariety;
+
+                                    if (typeof window !== 'undefined') {
+                                        console.log(`Debug Cart Item ${item.name} (ID: ${item.id}, Color: ${item.selectedColor}):`, {
+                                            wholesaleMin: item.wholesaleMin,
+                                            totalQtyForProduct,
+                                            requiredTonesCount: item.requiredTonesCount,
+                                            requiredTonesParsed: Number(item.requiredTonesCount),
+                                            meetsTonesVariety,
+                                            uniqueTonesInCartSize: uniqueTonesInCart.size,
+                                            uniqueTonesInCart: Array.from(uniqueTonesInCart),
+                                            isWholesale
+                                        });
+                                    }
+
                                     const priceUSD = isWholesale ? item.wholesalePrice! : item.priceUSD;
                                     const itemPrice = currency === 'USD' ? priceUSD : priceUSD * exchangeRate;
                                     const itemTotal = itemPrice * item.quantity;
@@ -214,8 +242,8 @@ export default function Cart() {
                                                 <h3 className="font-black text-base md:text-xl text-background-dark truncate font-brand italic tracking-tight">{item.name}</h3>
                                                 <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{item.category}</p>
 
-                                                {/* Visual Progress Bar for Wholesale Incentive */}
-                                                {!isWholesale && item.wholesaleMin && (
+                                                {/* Wholesale Progress Bar */}
+                                                {item.wholesaleMin && item.wholesaleMin > 1 && (
                                                     <div className="mt-2 w-full max-w-[180px]">
                                                         <div className="flex justify-between items-center mb-1">
                                                             <span className="text-[8px] font-black uppercase text-primary/60">Progreso Mayorista</span>
@@ -227,9 +255,15 @@ export default function Cart() {
                                                                 style={{ width: `${(totalQtyForProduct / item.wholesaleMin) * 100}%` }}
                                                             />
                                                         </div>
-                                                        <p className="text-[7px] font-bold text-slate-400 mt-1">
-                                                            Faltan <span className="text-primary">{item.wholesaleMin - totalQtyForProduct}</span> para precio especial
-                                                        </p>
+                                                        {!isWholesale && (
+                                                            <p className="text-[7px] font-bold text-slate-400 mt-1">
+                                                                {totalQtyForProduct < item.wholesaleMin ? (
+                                                                    <span>Faltan <span className="text-primary">{item.wholesaleMin - totalQtyForProduct}</span> para precio especial</span>
+                                                                ) : item.requiredTonesCount && item.requiredTonesCount > 0 && Array.from(uniqueTonesInCart).length < item.requiredTonesCount ? (
+                                                                    <span>Tiene que escoger <span className="text-primary">{item.requiredTonesCount}</span> variedad de tonos para precio especial (lleva {Array.from(uniqueTonesInCart).length})</span>
+                                                                ) : null}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 )}
                                                 {/* Color selector in cart */}

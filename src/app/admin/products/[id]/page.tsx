@@ -76,6 +76,9 @@ export default function EditProductPage() {
             });
             setColors(data.colors || []);
             setCurrentImageUrl(data.image_url || '');
+
+            // Set the toggle to true if required_tones_count > 0 temporarily for retro-compatibility display
+            setRequiresAllTones(data.required_tones_count > 0 || data.requires_all_tones === true);
         }
         setLoading(false);
     };
@@ -183,7 +186,7 @@ export default function EditProductPage() {
                     wholesale_price: formData.wholesale_price ? parseFloat(formData.wholesale_price) : null,
                     wholesale_min: formData.wholesale_min ? parseInt(formData.wholesale_min) : null,
                     colors: colors,
-                    requires_all_tones: requiresAllTones,
+                    required_tones_count: requiresAllTones ? colors.length : 0, // Fallback temporarily logic
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', productId);
@@ -191,11 +194,9 @@ export default function EditProductPage() {
             if (updateError) throw updateError;
 
             showToast('¡Producto actualizado con éxito!');
-            router.refresh();
-            // Don't auto-redirect, allow more edits if needed
-            setCurrentImageUrl(finalImageUrl);
-            setImageFile(null);
-            setImagePreview(null);
+            router.refresh(); // Refresh current router data
+            router.push('/admin/products'); // Redirect to products list
+
         } catch (error: any) {
             console.error('Error saving product:', error);
             showToast(`Error: ${error.message || 'No se pudo guardar el producto'}`);
@@ -440,7 +441,7 @@ export default function EditProductPage() {
                                         <label className="flex items-center gap-2 text-sm text-slate-300 font-medium cursor-pointer">
                                             <input
                                                 type="checkbox"
-                                                checked={requiresAllTones}
+                                                checked={!!requiresAllTones}
                                                 onChange={(e) => setRequiresAllTones(e.target.checked)}
                                                 className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer"
                                             />
