@@ -103,7 +103,7 @@ export default async function Home() {
 
         <div className="flex whitespace-nowrap overflow-hidden">
           <div className="flex animate-marquee items-center gap-10 md:gap-16 px-4 md:px-16 w-max will-change-transform">
-            {[...categories, ...categories, ...categories, ...categories].map((cat, i) => (
+            {[...categories.filter(c => c !== 'Bolsas de boutique'), ...categories.filter(c => c !== 'Bolsas de boutique'), ...categories.filter(c => c !== 'Bolsas de boutique'), ...categories.filter(c => c !== 'Bolsas de boutique')].map((cat, i) => (
               <span
                 key={`${cat}-${i}`}
                 className="flex-shrink-0 text-2xl md:text-5xl font-black text-primary/40 uppercase italic font-brand tracking-widest"

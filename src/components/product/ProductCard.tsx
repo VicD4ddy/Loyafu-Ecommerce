@@ -222,38 +222,20 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 <p className="hidden md:block text-[10px] text-slate-500 mt-0.5 line-clamp-2 italic">
                     {getProductDescription(product)}
                 </p>
-
-                <div className="flex items-center justify-between pt-0.5">
+                {/* Price and Add to Cart Section */}
+                <div className="flex items-center justify-between mt-auto pt-2">
                     <div className="flex flex-col">
-                        {product.priceUSD === 0 ? (
-                            <span className="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-full">
-                                Consultar precio
+                        <span className="text-xl md:text-2xl font-black text-primary tracking-tighter italic">
+                            ${product.priceUSD.toFixed(2)} <span className="text-xs font-bold text-slate-400 not-italic tracking-normal">/ Bs.{(product.priceUSD * exchangeRate).toFixed(2)}</span>
+                        </span>
+                        {(product.wholesalePrice ?? 0) > 0 && (
+                            <span className="text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full inline-block mt-0.5 w-max">
+                                Al mayor: ${product.wholesalePrice?.toFixed(2)} ({product.wholesaleMin || 3} unid.)
                             </span>
-                        ) : (
-                            <>
-                                <span className="text-lg font-black text-primary">
-                                    {currencySymbol}{price.toFixed(2)}
-                                    {currency === 'USD' && (
-                                        <span className="text-xs font-medium text-slate-400 ml-1">
-                                            / Bs.{(product.priceUSD * exchangeRate).toFixed(2)}
-                                        </span>
-                                    )}
-                                </span>
-                                {wholesalePriceDisplay && (
-                                    <span className="text-[10px] md:text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full mt-1 border border-green-100 flex items-center gap-1 w-fit">
-                                        Mayor: {wholesalePriceDisplay}
-                                        {getWholesaleMin(product) && (
-                                            <span className="opacity-60 font-black">
-                                                (min. {getWholesaleMin(product)})
-                                            </span>
-                                        )}
-                                    </span>
-                                )}
-                                <span className="text-[8px] md:text-[9px] text-slate-400 font-medium italic mt-0.5">
-                                    Nuestros precios no incluyen IVA
-                                </span>
-                            </>
                         )}
+                        <span className="text-[8px] md:text-[9px] text-slate-400 font-medium italic mt-0.5">
+                            Nuestros precios no incluyen IVA
+                        </span>
                     </div>
                 </div>
             </div>
