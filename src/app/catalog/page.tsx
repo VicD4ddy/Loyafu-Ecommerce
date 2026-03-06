@@ -50,7 +50,8 @@ function CatalogContent() {
                 images: p.images || [p.image_url],
                 wholesalePrice: p.wholesale_price,
                 wholesaleMin: p.wholesale_min,
-                badge: p.badge // Ensure badge is also passed if it exists
+                badge: p.badge, // Ensure badge is also passed if it exists
+                requiresAllTones: p.requires_all_tones
             }));
 
             setProducts(mappedProducts);

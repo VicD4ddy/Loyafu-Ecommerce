@@ -28,7 +28,8 @@ export default function CombosSection() {
                     priceUSD: p.price_usd,
                     wholesalePrice: p.wholesale_price,
                     wholesaleMin: p.wholesale_min,
-                    image: p.image_url
+                    image: p.image_url,
+                    requiresAllTones: p.requires_all_tones
                 })) || [];
                 setCombos(mappedData);
             }
