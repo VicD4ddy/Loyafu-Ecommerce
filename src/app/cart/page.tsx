@@ -215,18 +215,17 @@ export default function Cart() {
                                     const { baseItem: item, totalQuantity: totalQtyForProduct, variants, uniqueTones: uniqueTonesInCart } = grouped;
 
                                     // Evaluate specific rule: requires a certain number of varied tones
-                                    let meetsTonesVariety = true;
+                                    let meetsTonesVariety = false;
 
                                     if (item.requiredTonesCount !== undefined && Number(item.requiredTonesCount) > 0) {
                                         meetsTonesVariety = uniqueTonesInCart.size >= Number(item.requiredTonesCount);
-                                    } else if (item.requiredTonesCount === undefined) {
-                                        if ((item as any).requiresAllTones === true) {
-                                            meetsTonesVariety = false;
-                                        }
+                                    } else if (item.requiredTonesCount === undefined && (item as any).requiresAllTones === true) {
+                                        meetsTonesVariety = uniqueTonesInCart.size >= (item.colors?.length || 1);
                                     }
 
-                                    const hasValidWholesalePrices = item.wholesalePrice !== undefined && item.wholesaleMin !== undefined;
-                                    const isWholesale = hasValidWholesalePrices && (totalQtyForProduct >= item.wholesaleMin!) && meetsTonesVariety;
+                                    const meetsMinQty = item.wholesaleMin !== undefined && totalQtyForProduct >= item.wholesaleMin;
+                                    const hasValidWholesalePrices = item.wholesalePrice !== undefined;
+                                    const isWholesale = hasValidWholesalePrices && (meetsMinQty || meetsTonesVariety);
 
                                     const priceUSD = isWholesale ? item.wholesalePrice! : item.priceUSD;
                                     const itemPrice = currency === 'USD' ? priceUSD : priceUSD * exchangeRate;
@@ -273,10 +272,12 @@ export default function Cart() {
                                                         </div>
                                                         {!isWholesale && (
                                                             <p className="text-[9px] font-bold text-slate-500 mt-2">
-                                                                {totalQtyForProduct < item.wholesaleMin ? (
+                                                                {item.wholesaleMin && item.requiredTonesCount ? (
+                                                                    <span>Faltan <span className="text-primary">{item.wholesaleMin - totalQtyForProduct}</span> uds. o elegir min. <span className="text-primary">{item.requiredTonesCount}</span> tonos para dto</span>
+                                                                ) : item.wholesaleMin ? (
                                                                     <span>Faltan <span className="text-primary">{item.wholesaleMin - totalQtyForProduct}</span> uds. para precio especial</span>
-                                                                ) : item.requiredTonesCount && item.requiredTonesCount > 0 && Array.from(uniqueTonesInCart).length < item.requiredTonesCount ? (
-                                                                    <span>Tiene que escoger <span className="text-primary">{item.requiredTonesCount}</span> variedad de tonos (lleva {Array.from(uniqueTonesInCart).length})</span>
+                                                                ) : item.requiredTonesCount ? (
+                                                                    <span>Elige min. <span className="text-primary">{item.requiredTonesCount}</span> variedad de tonos para dto</span>
                                                                 ) : null}
                                                             </p>
                                                         )}

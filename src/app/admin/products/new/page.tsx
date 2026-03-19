@@ -27,6 +27,10 @@ export default function NewProductPage() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const [tonesImageFile, setTonesImageFile] = useState<File | null>(null);
+    const [tonesImagePreview, setTonesImagePreview] = useState<string | null>(null);
+    const tonesFileInputRef = useRef<HTMLInputElement>(null);
+
     const [formData, setFormData] = useState({
         id: '',
         name: '',
@@ -39,7 +43,7 @@ export default function NewProductPage() {
 
     const [colors, setColors] = useState<string[]>([]);
     const [newColor, setNewColor] = useState('');
-    const [requiresAllTones, setRequiresAllTones] = useState(false);
+    const [requiredTonesCount, setRequiredTonesCount] = useState<number>(0);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -51,6 +55,14 @@ export default function NewProductPage() {
             const file = e.target.files[0];
             setImageFile(file);
             setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleTonesImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setTonesImageFile(file);
+            setTonesImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -108,9 +120,10 @@ export default function NewProductPage() {
         setSaving(true);
 
         let imageUrl = '';
+        let tonesImageUrl = null;
 
         try {
-            // 1. Upload Image to Storage if exists
+            // 1. Upload Images to Storage if exists
             if (imageFile) {
                 const compressedBlob = await compressImage(imageFile);
                 const fileExt = 'jpg'; // We compress to jpeg
@@ -132,6 +145,27 @@ export default function NewProductPage() {
                 imageUrl = publicUrlData.publicUrl;
             }
 
+            if (tonesImageFile) {
+                const compressedBlob = await compressImage(tonesImageFile);
+                const fileExt = 'jpg';
+                const fileName = `${Date.now()}_tones_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const filePath = `products/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('product-images')
+                    .upload(filePath, compressedBlob, {
+                        contentType: 'image/jpeg'
+                    });
+
+                if (uploadError) throw uploadError;
+
+                const { data: publicUrlData } = supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+
+                tonesImageUrl = publicUrlData.publicUrl;
+            }
+
             // 2. Insert into Database
             const { error: insertError } = await supabase
                 .from('products')
@@ -142,10 +176,11 @@ export default function NewProductPage() {
                     description: formData.description,
                     category: formData.category,
                     image_url: imageUrl,
+                    tones_image_url: tonesImageUrl,
                     wholesale_price: formData.wholesale_price ? parseFloat(formData.wholesale_price) : null,
                     wholesale_min: formData.wholesale_min ? parseInt(formData.wholesale_min) : null,
                     colors: colors,
-                    required_tones_count: requiresAllTones ? colors.length : 0, // Fallback temporarily logic
+                    required_tones_count: requiredTonesCount,
                     updated_at: new Date().toISOString()
                 });
 
@@ -221,6 +256,45 @@ export default function NewProductPage() {
                                     className="hidden"
                                 />
                                 <p className="text-[10px] text-[#6d667c] mt-4 italic text-center">Formato cuadrado (1:1) recomendado.</p>
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-black text-[#6d667c] uppercase tracking-widest mb-4 block pl-1">Imagen de Tonos (Opcional)</label>
+                                <div
+                                    className="relative aspect-square w-full rounded-3xl overflow-hidden border-2 border-dashed border-white/10 flex flex-col items-center justify-center bg-[#251e30] group cursor-pointer hover:border-primary/50 transition-all shadow-inner"
+                                    onClick={() => tonesFileInputRef.current?.click()}
+                                >
+                                    {tonesImagePreview ? (
+                                        <>
+                                            <Image
+                                                src={tonesImagePreview}
+                                                alt="Tones Preview"
+                                                fill
+                                                className="object-cover group-hover:opacity-40 transition-opacity"
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="bg-black/50 p-3 rounded-full backdrop-blur-md">
+                                                    <UploadCloud className="w-6 h-6 text-white" />
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center p-6 flex flex-col items-center">
+                                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform group-hover:bg-primary/20">
+                                                <ImageIcon className="w-8 h-8 text-[#6d667c] group-hover:text-primary transition-colors" />
+                                            </div>
+                                            <span className="text-sm font-bold text-white mb-1 tracking-tight">Seleccionar foto de los tonos</span>
+                                            <span className="text-[10px] text-[#6d667c] uppercase font-black tracking-widest">JPG, PNG o WEBP</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    ref={tonesFileInputRef}
+                                    onChange={handleTonesImageChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
                             </div>
 
                             <div className="p-6 bg-white/[0.02] rounded-2xl border border-white/5">
@@ -381,12 +455,12 @@ export default function NewProductPage() {
                                                 <input
                                                     type="number"
                                                     min="0"
-                                                    value={requiresAllTones ? 1 : 0} // Temporally using old boolean code logic here for compatibility before state switch
-                                                    onChange={(e) => setRequiresAllTones(parseInt(e.target.value) > 0)}
+                                                    value={requiredTonesCount || ''}
+                                                    onChange={(e) => setRequiredTonesCount(parseInt(e.target.value) || 0)}
                                                     className="w-24 bg-[#251e30] border border-white/10 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-primary transition-all text-sm font-bold text-center"
                                                 />
                                                 <span className="text-[10px] text-slate-400">
-                                                    Ej: 3 (exigirá que el usuario lleve 3 colores diferentes). 0 = No exigir.
+                                                    Ej: 3 (aplica dto. si elige 3 tonos distintos). 0 = No aplica.
                                                 </span>
                                             </div>
                                         </div>

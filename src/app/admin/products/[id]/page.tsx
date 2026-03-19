@@ -32,6 +32,11 @@ export default function EditProductPage() {
     const [currentImageUrl, setCurrentImageUrl] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const [tonesImageFile, setTonesImageFile] = useState<File | null>(null);
+    const [tonesImagePreview, setTonesImagePreview] = useState<string | null>(null);
+    const [currentTonesImageUrl, setCurrentTonesImageUrl] = useState('');
+    const tonesFileInputRef = useRef<HTMLInputElement>(null);
+
     const [formData, setFormData] = useState({
         id: '',
         name: '',
@@ -44,7 +49,7 @@ export default function EditProductPage() {
 
     const [colors, setColors] = useState<string[]>([]);
     const [newColor, setNewColor] = useState('');
-    const [requiresAllTones, setRequiresAllTones] = useState(false);
+    const [requiredTonesCount, setRequiredTonesCount] = useState<number>(0);
 
     useEffect(() => {
         if (productId) {
@@ -76,9 +81,9 @@ export default function EditProductPage() {
             });
             setColors(data.colors || []);
             setCurrentImageUrl(data.image_url || '');
+            setCurrentTonesImageUrl(data.tones_image_url || '');
 
-            // Set the toggle to true if required_tones_count > 0 temporarily for retro-compatibility display
-            setRequiresAllTones(data.required_tones_count > 0 || data.requires_all_tones === true);
+            setRequiredTonesCount(data.required_tones_count || 0);
         }
         setLoading(false);
     };
@@ -93,6 +98,14 @@ export default function EditProductPage() {
             const file = e.target.files[0];
             setImageFile(file);
             setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleTonesImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setTonesImageFile(file);
+            setTonesImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -150,6 +163,7 @@ export default function EditProductPage() {
         setSaving(true);
 
         let finalImageUrl = currentImageUrl;
+        let finalTonesImageUrl = currentTonesImageUrl;
 
         try {
             // 1. Upload new image if selected
@@ -174,6 +188,27 @@ export default function EditProductPage() {
                 finalImageUrl = publicUrlData.publicUrl;
             }
 
+            if (tonesImageFile) {
+                const compressedBlob = await compressImage(tonesImageFile);
+                const fileExt = 'jpg';
+                const fileName = `${Date.now()}_tones_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const filePath = `products/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('product-images')
+                    .upload(filePath, compressedBlob, {
+                        contentType: 'image/jpeg'
+                    });
+
+                if (uploadError) throw uploadError;
+
+                const { data: publicUrlData } = supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+
+                finalTonesImageUrl = publicUrlData.publicUrl;
+            }
+
             // 2. Update Database
             const { error: updateError } = await supabase
                 .from('products')
@@ -183,10 +218,11 @@ export default function EditProductPage() {
                     description: formData.description,
                     category: formData.category,
                     image_url: finalImageUrl,
+                    tones_image_url: finalTonesImageUrl,
                     wholesale_price: formData.wholesale_price ? parseFloat(formData.wholesale_price) : null,
                     wholesale_min: formData.wholesale_min ? parseInt(formData.wholesale_min) : null,
                     colors: colors,
-                    required_tones_count: requiresAllTones ? colors.length : 0, // Fallback temporarily logic
+                    required_tones_count: requiredTonesCount,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', productId);
@@ -287,6 +323,44 @@ export default function EditProductPage() {
                                     className="hidden"
                                 />
                                 <p className="text-[10px] text-[#6d667c] mt-4 italic text-center">Formato cuadrado (1:1) recomendado.</p>
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-black text-[#6d667c] uppercase tracking-widest mb-4 block pl-1">Imagen de Tonos (Opcional)</label>
+                                <div
+                                    className="relative aspect-square w-full rounded-3xl overflow-hidden border-2 border-dashed border-white/10 flex flex-col items-center justify-center bg-[#251e30] group cursor-pointer hover:border-primary/50 transition-all shadow-inner"
+                                    onClick={() => tonesFileInputRef.current?.click()}
+                                >
+                                    {(tonesImagePreview || currentTonesImageUrl) ? (
+                                        <>
+                                            <Image
+                                                src={tonesImagePreview || currentTonesImageUrl}
+                                                alt="Tones Preview"
+                                                fill
+                                                className="object-cover group-hover:opacity-40 transition-opacity"
+                                                unoptimized={currentTonesImageUrl?.includes('.gif') || !!tonesImagePreview}
+                                            />
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                                                <UploadCloud className="w-10 h-10 mb-2" />
+                                                <span className="text-xs font-bold uppercase tracking-widest bg-black/50 px-4 py-2 rounded-full backdrop-blur-md">Cambiar Imagen</span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-[#6d667c] flex flex-col items-center p-8 text-center">
+                                            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                                <ImageIcon className="w-8 h-8 opacity-50" />
+                                            </div>
+                                            <span className="text-xs font-bold uppercase tracking-widest mb-1">Subir Foto de Tonos</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    ref={tonesFileInputRef}
+                                    onChange={handleTonesImageChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
                             </div>
 
                             <div className="p-6 bg-white/[0.02] rounded-2xl border border-white/5">
@@ -435,18 +509,26 @@ export default function EditProductPage() {
                                     </div>
                                 </div>
 
-                                {/* Checkbox requiring all tones for wholesale discount */}
+                                {/* Exigir cantidad específica de tonos para descuento mayorista */}
                                 {colors.length > 1 && formData.wholesale_price && (
                                     <div className="pt-2">
-                                        <label className="flex items-center gap-2 text-sm text-slate-300 font-medium cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={!!requiresAllTones}
-                                                onChange={(e) => setRequiresAllTones(e.target.checked)}
-                                                className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0 transition-all cursor-pointer"
-                                            />
-                                            Exigir llevar UNO DE CADA TONO para aplicar descuento
-                                        </label>
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-sm text-slate-300 font-medium">
+                                                Variedad Min. de Tonos para Mayorista
+                                            </label>
+                                            <div className="flex items-center gap-3">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={requiredTonesCount || ''}
+                                                    onChange={(e) => setRequiredTonesCount(parseInt(e.target.value) || 0)}
+                                                    className="w-24 bg-[#251e30] border border-white/10 text-white px-3 py-2 rounded-lg focus:outline-none focus:border-primary transition-all text-sm font-bold text-center"
+                                                />
+                                                <span className="text-[10px] text-slate-400">
+                                                    Ej: 3 (aplica dto. si elige 3 tonos distintos). 0 = No aplica.
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>

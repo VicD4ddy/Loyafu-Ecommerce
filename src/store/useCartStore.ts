@@ -14,6 +14,7 @@ export interface Product {
     badge?: 'nuevo' | 'promo' | 'agotado';
     colors?: string[]; // Available colors/tones
     requiredTonesCount?: number; // Requires a specific count of different tones for wholesale
+    tonesImage?: string; // Optional image specifically for showing the tones/swatches
 }
 
 export interface CartItem extends Product {
@@ -143,7 +144,7 @@ export const useCartStore = create<CartState>()(
                 const totalUSD = state.items.reduce((sum, item) => {
                     const totalQtyForProduct = state.items.reduce((qSum, i) => i.id === item.id ? qSum + i.quantity : qSum, 0);
 
-                    let meetsTonesVariety = true;
+                    let meetsTonesVariety = false;
                     if (item.requiredTonesCount !== undefined && item.requiredTonesCount > 0) {
                         const tonesForThisProduct = state.items
                             .filter(i => i.id === item.id)
@@ -151,13 +152,14 @@ export const useCartStore = create<CartState>()(
                             .filter(Boolean) as string[];
                         const uniqueTones = new Set(tonesForThisProduct);
                         meetsTonesVariety = uniqueTones.size >= item.requiredTonesCount;
-                    } else if (item.requiredTonesCount === undefined) {
-                        if ((item as any).requiresAllTones === true) {
-                            meetsTonesVariety = false;
-                        }
+                    } else if (item.requiredTonesCount === undefined && (item as any).requiresAllTones === true) {
+                        const tonesForThisProduct = state.items.filter(i => i.id === item.id).map(i => i.selectedColor).filter(Boolean) as string[];
+                        meetsTonesVariety = new Set(tonesForThisProduct).size >= (item.colors?.length || 1);
                     }
 
-                    const isWholesale = !!(item.wholesalePrice && item.wholesaleMin && totalQtyForProduct >= item.wholesaleMin && meetsTonesVariety);
+                    const meetsMinQty = !!(item.wholesaleMin && totalQtyForProduct >= item.wholesaleMin);
+
+                    const isWholesale = !!(item.wholesalePrice && (meetsMinQty || meetsTonesVariety));
                     const price = isWholesale ? item.wholesalePrice! : item.priceUSD;
 
                     return sum + price * item.quantity;
@@ -172,7 +174,7 @@ export const useCartStore = create<CartState>()(
                 return state.items.reduce((sum, item) => {
                     const totalQtyForProduct = state.items.reduce((qSum, i) => i.id === item.id ? qSum + i.quantity : qSum, 0);
 
-                    let meetsTonesVariety = true;
+                    let meetsTonesVariety = false;
                     if (item.requiredTonesCount !== undefined && item.requiredTonesCount > 0) {
                         const tonesForThisProduct = state.items
                             .filter(i => i.id === item.id)
@@ -180,13 +182,14 @@ export const useCartStore = create<CartState>()(
                             .filter(Boolean) as string[];
                         const uniqueTones = new Set(tonesForThisProduct);
                         meetsTonesVariety = uniqueTones.size >= item.requiredTonesCount;
-                    } else if (item.requiredTonesCount === undefined) {
-                        if ((item as any).requiresAllTones === true) {
-                            meetsTonesVariety = false;
-                        }
+                    } else if (item.requiredTonesCount === undefined && (item as any).requiresAllTones === true) {
+                        const tonesForThisProduct = state.items.filter(i => i.id === item.id).map(i => i.selectedColor).filter(Boolean) as string[];
+                        meetsTonesVariety = new Set(tonesForThisProduct).size >= (item.colors?.length || 1);
                     }
 
-                    const isWholesale = !!(item.wholesalePrice && item.wholesaleMin && totalQtyForProduct >= item.wholesaleMin && meetsTonesVariety);
+                    const meetsMinQty = !!(item.wholesaleMin && totalQtyForProduct >= item.wholesaleMin);
+
+                    const isWholesale = !!(item.wholesalePrice && (meetsMinQty || meetsTonesVariety));
                     const price = isWholesale ? item.wholesalePrice! : item.priceUSD;
 
                     return sum + price * item.quantity;

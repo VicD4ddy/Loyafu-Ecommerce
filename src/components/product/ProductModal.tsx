@@ -90,7 +90,14 @@ export default function ProductModal() {
 
     if (wholesalePriceUSD && wholesalePriceUSD > 0) {
         const wholesaleVal = currency === 'USD' ? wholesalePriceUSD : wholesalePriceUSD * exchangeRate;
-        const minLabel = wholesaleMin ? ` (x${wholesaleMin} unid.)` : '';
+        let minLabel = '';
+        if (wholesaleMin && selectedProduct.requiredTonesCount) {
+             minLabel = ` (x${wholesaleMin} unid. o min. ${selectedProduct.requiredTonesCount} tonos distintos)`;
+        } else if (wholesaleMin) {
+             minLabel = ` (x${wholesaleMin} unid.)`;
+        } else if (selectedProduct.requiredTonesCount) {
+             minLabel = ` (min. ${selectedProduct.requiredTonesCount} tonos distintos)`;
+        }
         wholesalePriceDisplay = `${currencySymbol}${wholesaleVal.toFixed(2)}${minLabel}`;
     }
 
@@ -151,14 +158,46 @@ export default function ProductModal() {
                 </button>
 
                 {/* Left Side: Product Media (Desktop Only) */}
-                <div className="hidden md:flex w-1/2 bg-slate-100 relative">
-                    <Image
-                        src={selectedProduct.image}
-                        alt={selectedProduct.name}
-                        fill
-                        className="object-contain p-4"
-                        priority
-                    />
+                <div className="hidden md:flex w-1/2 bg-[#f8f7fa] relative flex-col overflow-hidden">
+                    <div className="flex-1 relative w-full h-full">
+                        <Image
+                            src={selectedProduct.tonesImage && activeImageIndex === 1 ? selectedProduct.tonesImage : selectedProduct.image}
+                            alt={selectedProduct.name}
+                            fill
+                            className="object-contain p-12 drop-shadow-2xl transition-all duration-500 hover:scale-105"
+                            priority
+                            unoptimized={selectedProduct.image?.includes('.gif')}
+                        />
+                        {/* Decorative background glow */}
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/5 to-transparent mix-blend-multiply pointer-events-none" />
+                    </div>
+
+                    {/* Thumbnails Navigator */}
+                    {selectedProduct.tonesImage && (
+                        <div className="absolute bottom-8 w-full flex justify-center gap-4 px-4 z-10 animate-in fade-in slide-in-from-bottom-8 duration-500">
+                            <button
+                                onClick={() => setActiveImageIndex(0)}
+                                className={cn(
+                                    "w-16 h-16 relative rounded-[1rem] overflow-hidden border-[3px] transition-all bg-white shadow-xl hover:scale-110",
+                                    activeImageIndex === 0 ? "border-primary opacity-100 ring-4 ring-primary/20 scale-110" : "border-transparent opacity-60 hover:opacity-100"
+                                )}
+                            >
+                                <Image src={selectedProduct.image} alt="Main" fill className="object-cover" />
+                            </button>
+                            <button
+                                onClick={() => setActiveImageIndex(1)}
+                                className={cn(
+                                    "w-16 h-16 relative rounded-[1rem] overflow-hidden border-[3px] transition-all bg-white shadow-xl hover:scale-110",
+                                    activeImageIndex === 1 ? "border-primary opacity-100 ring-4 ring-primary/20 scale-110" : "border-transparent opacity-60 hover:opacity-100"
+                                )}
+                            >
+                                <Image src={selectedProduct.tonesImage} alt="Tones" fill className="object-cover" />
+                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-1 pt-4">
+                                    <span className="text-[8px] font-black text-white uppercase tracking-widest drop-shadow-md">Tonos</span>
+                                </div>
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Side / Mobile Main Scroll Area */}
@@ -176,25 +215,49 @@ export default function ProductModal() {
                                         setActiveImageIndex(index);
                                     }}
                                 >
-                                    {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                                    {selectedProduct.tonesImage ? (
+                                        <>
+                                            <div className="flex-shrink-0 w-full h-full relative snap-center bg-[#f8f7fa]">
+                                                <Image
+                                                    src={selectedProduct.image}
+                                                    alt={selectedProduct.name}
+                                                    fill
+                                                    className="object-contain p-6 drop-shadow-xl"
+                                                    priority
+                                                    unoptimized={selectedProduct.image?.includes('.gif')}
+                                                />
+                                            </div>
+                                            <div className="flex-shrink-0 w-full h-full relative snap-center bg-[#f8f7fa]">
+                                                <Image
+                                                    src={selectedProduct.tonesImage}
+                                                    alt={`${selectedProduct.name} Tonos`}
+                                                    fill
+                                                    className="object-contain p-6 drop-shadow-xl"
+                                                />
+                                                <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-xl px-3 py-1.5 text-white rounded-full text-[9px] font-black tracking-widest uppercase shadow-lg border border-white/10">
+                                                    Referencia de Tonos
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : selectedProduct.images && selectedProduct.images.length > 0 ? (
                                         selectedProduct.images.map((img, idx) => (
-                                            <div key={idx} className="flex-shrink-0 w-full h-full relative snap-center bg-slate-100">
+                                            <div key={idx} className="flex-shrink-0 w-full h-full relative snap-center bg-[#f8f7fa]">
                                                 <Image
                                                     src={img}
                                                     alt={`${selectedProduct.name} ${idx + 1}`}
                                                     fill
-                                                    className="object-contain p-3"
+                                                    className="object-contain p-6 drop-shadow-xl"
                                                     priority={idx === 0}
                                                 />
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="flex-shrink-0 w-full h-full relative snap-center bg-slate-100">
+                                        <div className="flex-shrink-0 w-full h-full relative snap-center bg-[#f8f7fa]">
                                             <Image
                                                 src={selectedProduct.image}
                                                 alt={selectedProduct.name}
                                                 fill
-                                                className="object-contain p-3"
+                                                className="object-contain p-6 drop-shadow-xl"
                                                 priority
                                             />
                                         </div>
@@ -202,19 +265,17 @@ export default function ProductModal() {
                                 </div>
 
                                 {/* Carousel Indicators */}
-                                {selectedProduct.images && selectedProduct.images.length > 1 && (
-                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-black/20 backdrop-blur-md px-2 py-1 rounded-full">
-                                        {selectedProduct.images.map((_, idx) => (
-                                            <div
-                                                key={idx}
-                                                className={cn(
-                                                    "w-1.5 h-1.5 rounded-full transition-all duration-300",
-                                                    activeImageIndex === idx ? "bg-white w-3" : "bg-white/40"
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                                    {(selectedProduct.tonesImage ? [0, 1] : selectedProduct.images && selectedProduct.images.length > 1 ? selectedProduct.images : []).map((_, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={cn(
+                                                "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                                                activeImageIndex === idx ? "bg-white w-4 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "bg-white/40"
+                                            )}
+                                        />
+                                    ))}
+                                </div>
 
                                 {/* Floating Info Badge on Image (Mobile) */}
                                 <div className="absolute top-4 left-4 z-10 pointer-events-none">

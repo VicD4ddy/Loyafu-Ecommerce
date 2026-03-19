@@ -30,7 +30,8 @@ export default function CombosSection() {
                     wholesalePrice: p.wholesale_price,
                     wholesaleMin: p.wholesale_min,
                     image: p.image_url,
-                    requiredTonesCount: p.required_tones_count
+                    requiredTonesCount: p.required_tones_count,
+                    tonesImage: p.tones_image_url
                 })) || [];
                 setCombos(mappedData);
             }
