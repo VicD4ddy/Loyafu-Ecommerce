@@ -28,7 +28,7 @@ export default function ProductModal() {
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
-    const [selectedColors, setSelectedColors] = useState<string[]>([]);
+    const [toneQuantities, setToneQuantities] = useState<Record<string, number>>({});
     const [selectedCombination, setSelectedCombination] = useState<{name: string, units: number} | null>(null);
 
     useEffect(() => {
@@ -37,7 +37,12 @@ export default function ProductModal() {
             setAddedToCart(false);
             setDragY(0);
             // Auto-select first color if product has colors
-            setSelectedColors(selectedProduct.colors && selectedProduct.colors.length > 0 ? [selectedProduct.colors[0]] : []);
+            // Initialize with first color having qty 1
+            if (selectedProduct.colors && selectedProduct.colors.length > 0) {
+                setToneQuantities({ [selectedProduct.colors[0]]: 1 });
+            } else {
+                setToneQuantities({});
+            }
             setSelectedCombination(null);
         }
     }, [selectedProduct, isFavoriteStore, isOpen]);
@@ -106,12 +111,15 @@ export default function ProductModal() {
     const hasColors = selectedProduct.colors && selectedProduct.colors.length > 0;
     const hasCombinations = selectedProduct.wholesaleCombinations && selectedProduct.wholesaleCombinations.length > 0;
 
+    const totalToneUnits = Object.values(toneQuantities).reduce((sum, q) => sum + q, 0);
+    const selectedToneCount = Object.keys(toneQuantities).filter(k => toneQuantities[k] > 0).length;
+
     const handleAddToCart = () => {
         if (selectedCombination) {
             addToCart(selectedProduct, selectedCombination.name, selectedCombination.units);
-        } else if (selectedColors.length > 0) {
-            selectedColors.forEach(color => {
-                addToCart(selectedProduct, color);
+        } else if (totalToneUnits > 0) {
+            Object.entries(toneQuantities).forEach(([color, qty]) => {
+                if (qty > 0) addToCart(selectedProduct, color, qty);
             });
         } else {
             addToCart(selectedProduct, undefined);
@@ -353,35 +361,76 @@ export default function ProductModal() {
                         {/* Bottom Sticky Action Bar */}
                         <div className="p-6 md:p-8 bg-white/80 backdrop-blur-xl border-t border-slate-100 mt-auto space-y-4">
 
-                            {/* Color/Tone Selector (Retail) */}
+                            {/* Color/Tone Selector with Quantity (Retail) */}
                             {hasColors && (
-                                <div className={cn("space-y-2 transition-opacity", selectedCombination ? "opacity-30" : "opacity-100")}>
+                                <div className={cn("space-y-2.5 transition-opacity", selectedCombination ? "opacity-30 pointer-events-none" : "opacity-100")}>
                                     <div className="flex items-center justify-between">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tonos individuales (Detal)</p>
+                                        {totalToneUnits > 0 && (
+                                            <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                                                {totalToneUnits} {totalToneUnits === 1 ? 'unid.' : 'unids.'} · {selectedToneCount} {selectedToneCount === 1 ? 'tono' : 'tonos'}
+                                            </span>
+                                        )}
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedProduct.colors!.map((color) => (
-                                            <button
-                                                key={color}
-                                                onClick={() => {
-                                                    setSelectedCombination(null);
-                                                    if (selectedColors.includes(color)) {
-                                                        setSelectedColors(selectedColors.filter(c => c !== color));
-                                                    } else {
-                                                        setSelectedColors([...selectedColors, color]);
-                                                    }
-                                                }}
-                                                title={color}
-                                                className={cn(
-                                                    "px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all",
-                                                    selectedColors.includes(color)
-                                                        ? "bg-primary text-white border-primary shadow-md shadow-primary/30 scale-105"
-                                                        : "bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary"
-                                                )}
-                                            >
-                                                {color}
-                                            </button>
-                                        ))}
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {selectedProduct.colors!.map((color) => {
+                                            const qty = toneQuantities[color] || 0;
+                                            return (
+                                                <div
+                                                    key={color}
+                                                    className={cn(
+                                                        "flex items-center justify-between gap-1 rounded-xl border-2 px-2.5 py-1.5 transition-all",
+                                                        qty > 0
+                                                            ? "border-primary bg-primary/5 shadow-sm"
+                                                            : "border-slate-200 bg-white"
+                                                    )}
+                                                >
+                                                    <span className={cn(
+                                                        "text-[11px] font-bold truncate",
+                                                        qty > 0 ? "text-primary" : "text-slate-500"
+                                                    )}>
+                                                        {color}
+                                                    </span>
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedCombination(null);
+                                                                if (qty > 0) {
+                                                                    const updated = { ...toneQuantities };
+                                                                    if (qty === 1) delete updated[color];
+                                                                    else updated[color] = qty - 1;
+                                                                    setToneQuantities(updated);
+                                                                }
+                                                            }}
+                                                            disabled={qty === 0}
+                                                            className={cn(
+                                                                "w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black transition-all",
+                                                                qty > 0
+                                                                    ? "bg-primary/10 text-primary hover:bg-primary/20 active:scale-90"
+                                                                    : "bg-slate-100 text-slate-300 cursor-not-allowed"
+                                                            )}
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span className={cn(
+                                                            "w-5 text-center text-xs font-black tabular-nums",
+                                                            qty > 0 ? "text-primary" : "text-slate-300"
+                                                        )}>
+                                                            {qty}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedCombination(null);
+                                                                setToneQuantities({ ...toneQuantities, [color]: qty + 1 });
+                                                            }}
+                                                            className="w-6 h-6 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center text-xs font-black transition-all active:scale-90"
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -399,7 +448,7 @@ export default function ProductModal() {
                                             <button
                                                 key={combo.name}
                                                 onClick={() => {
-                                                    setSelectedColors([]);
+                                                    setToneQuantities({});
                                                     setSelectedCombination(combo);
                                                 }}
                                                 className={cn(
@@ -438,7 +487,7 @@ export default function ProductModal() {
                                     ) : (
                                         <>
                                             <ShoppingBag className="w-5 h-5" />
-                                            {selectedColors.length > 1 ? `Agregar ${selectedColors.length} Tonos` : "Agregar"}
+                                            {totalToneUnits > 1 ? `Agregar ${totalToneUnits} unidades` : "Agregar"}
                                         </>
                                     )}
                                 </button>

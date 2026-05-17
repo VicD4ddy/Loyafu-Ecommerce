@@ -2,24 +2,25 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, Truck, ArrowRight, ShieldCheck, MessageCircle, ShoppingBag, Heart, ShoppingCart, Store, PackageCheck, Smartphone, Banknote, Bitcoin, RotateCcw } from 'lucide-react';
+import { Minus, Plus, Trash2, Truck, ArrowRight, ShieldCheck, MessageCircle, ShoppingBag, Heart, Store, PackageCheck, Smartphone, Banknote, Bitcoin, RotateCcw, CheckCircle, PartyPopper } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { DeliveryModal } from '@/components/cart/DeliveryModal';
 import { DeliveryDetails } from '@/store/useCartStore';
 import { useSettings } from '@/context/SettingsContext';
-import { useProductModalStore } from '@/store/useProductModalStore';
-import { PRODUCTS } from '@/data/products';
+
 
 export default function Cart() {
     const { items, removeItem, updateQuantity, updateItemColor, getTotal, currency, exchangeRate, deliveryMethod, setDeliveryMethod, deliveryDetails, setDeliveryDetails, clearCart } = useCartStore();
-    const openModal = useProductModalStore((state) => state.openModal);
     const { getSetting } = useSettings();
     const [mounted, setMounted] = useState(false);
     const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'pago_movil' | 'binance' | 'divisa'>('pago_movil');
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [orderComplete, setOrderComplete] = useState(false);
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
 
     const isNationalShipping = deliveryMethod === 'national_shipping';
     const NATIONAL_SHIPPING_MIN = 20;
@@ -61,11 +62,9 @@ export default function Cart() {
         updateQuantity(id, newQuantity, color);
     };
 
-    const generateWhatsAppLink = (detailsToUse: DeliveryDetails | null = deliveryDetails) => {
-        const phone = getSetting('whatsapp_number') || "584244096534";
+    const generateOrderMessage = (detailsToUse: DeliveryDetails | null = deliveryDetails) => {
         const storeName = getSetting('store_name') || "Loyafu";
-        const welcomeMsg = getSetting('delivery_message') || "Hola! Quiero realizar el siguiente pedido";
-        let message = `${welcomeMsg} en ${storeName}:\n\n`;
+        let message = `🛍️ NUEVO PEDIDO en ${storeName}:\n\n`;
 
         items.forEach(item => {
             const isWholesale = item.wholesalePrice && item.wholesaleMin && item.quantity >= item.wholesaleMin;
@@ -84,6 +83,12 @@ export default function Cart() {
                 'Envío Nacional';
 
         message += `\n📦 Entrega: ${deliveryText}`;
+
+        // Customer contact info
+        if (customerName || customerPhone) {
+            message += `\n\n👤 Cliente: ${customerName}`;
+            message += `\n📱 Teléfono: ${customerPhone}`;
+        }
 
         if (detailsToUse && deliveryMethod !== 'pickup') {
             message += `\n\n--- Datos de Envío ---`;
@@ -113,7 +118,6 @@ export default function Cart() {
         const currentTotal = currency === 'USD' ? totalUSD : totalBs;
         message += `Total Final: ${currencySymbol}${currentTotal.toFixed(2)}`;
 
-        // Only show Bs equivalent if paying in local currency (Pago Móvil)
         if (exchangeRate > 0 && paymentMethod === 'pago_movil') {
             const totalBsFinal = totalUSD * exchangeRate;
             message += ` / Bs.${totalBsFinal.toFixed(2)}`;
@@ -124,22 +128,80 @@ export default function Cart() {
         }
         message += `\n* Precios no incluyen IVA.`;
 
-        return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        return message;
+    };
+
+    const sendOrderNotification = async (detailsToUse: DeliveryDetails | null = deliveryDetails) => {
+        try {
+            const message = generateOrderMessage(detailsToUse);
+            await fetch('/api/orders/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message }),
+            });
+        } catch (error) {
+            // Notification failure should NOT block the order confirmation
+            console.error('Failed to send notification:', error);
+        }
     };
 
     const handleCheckout = () => {
         if (deliveryMethod === 'pickup') {
-            window.open(generateWhatsAppLink(), '_blank');
+            sendOrderNotification();
+            setOrderComplete(true);
+            clearCart();
         } else {
             setIsDeliveryModalOpen(true);
         }
     };
 
-    // Cross-selling: Suggest 3 random products not in cart
-    const suggestedProducts = PRODUCTS
-        .filter(p => !items.some(item => item.id === p.id))
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 4);
+
+    // Order complete confirmation screen
+    if (orderComplete) {
+        return (
+            <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6 animate-in fade-in zoom-in-95 duration-1000">
+                {/* Animated success icon */}
+                <div className="relative mb-10">
+                    <div className="absolute inset-0 bg-green-400/30 rounded-full blur-[100px] animate-pulse" />
+                    <div className="relative w-36 h-36 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-[0_20px_60px_-10px_rgba(34,197,94,0.5)] animate-in zoom-in-50 duration-700">
+                        <CheckCircle className="w-20 h-20 text-white stroke-[1.5]" />
+                    </div>
+                    {/* Confetti-like decorative dots */}
+                    <div className="absolute -top-4 -right-4 w-6 h-6 bg-primary rounded-full animate-bounce delay-100" />
+                    <div className="absolute -bottom-2 -left-6 w-4 h-4 bg-amber-400 rounded-full animate-bounce delay-300" />
+                    <div className="absolute top-2 -left-8 w-3 h-3 bg-pink-400 rounded-full animate-bounce delay-500" />
+                    <div className="absolute -bottom-4 right-0 w-5 h-5 bg-blue-400 rounded-full animate-bounce delay-200" />
+                </div>
+
+                <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-background-dark mb-4 tracking-tighter uppercase italic font-brand leading-none">
+                    ¡Pedido <span className="text-green-500">Registrado</span>!
+                </h1>
+                <p className="text-slate-500 max-w-md mb-4 font-medium leading-relaxed text-base md:text-lg">
+                    Tu pedido ha sido recibido exitosamente. Nos pondremos en contacto contigo muy pronto para confirmar los detalles.
+                </p>
+                <div className="flex items-center gap-2 text-sm text-primary font-bold mb-10 bg-primary/5 px-5 py-2.5 rounded-full border border-primary/10">
+                    <PartyPopper className="w-4 h-4" />
+                    ¡Gracias por comprar en Loyafu!
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <Link
+                        href="/catalog"
+                        className="group bg-background-dark text-white px-10 py-4 rounded-full font-bold shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 hover:shadow-primary/20"
+                    >
+                        Seguir Comprando
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-primary" />
+                    </Link>
+                    <Link
+                        href="/"
+                        className="group bg-white text-background-dark px-10 py-4 rounded-full font-bold shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3 border border-slate-200"
+                    >
+                        Ir al Inicio
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     if (items.length === 0) {
         return (
@@ -168,7 +230,7 @@ export default function Cart() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-36 md:pb-20">
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
                 {/* Left Column: Cart items & Suggested */}
@@ -490,6 +552,31 @@ export default function Cart() {
                                 </div>
                             </div>
 
+                            {/* Customer Contact Info */}
+                            <div className="space-y-3 mb-4 relative z-10">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Datos de contacto</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder="Tu nombre *"
+                                            value={customerName}
+                                            onChange={(e) => setCustomerName(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="tel"
+                                            placeholder="Tu teléfono (WhatsApp) *"
+                                            value={customerPhone}
+                                            onChange={(e) => setCustomerPhone(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Terms Checkbox */}
                             <div className="flex items-start gap-3 mt-4 mb-6 relative z-10">
                                 <label className="relative flex cursor-pointer items-start gap-4">
@@ -517,59 +604,22 @@ export default function Cart() {
 
                             <button
                                 onClick={handleCheckout}
-                                disabled={!termsAccepted}
+                                disabled={!termsAccepted || !customerName.trim() || !customerPhone.trim()}
                                 className={cn(
                                     "w-full py-5 rounded-3xl font-black text-lg shadow-xl transition-all flex items-center justify-center gap-3",
-                                    !termsAccepted
+                                    (!termsAccepted || !customerName.trim() || !customerPhone.trim())
                                         ? "bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5 opacity-80"
-                                        : deliveryMethod === 'pickup'
-                                            ? "bg-[#25D366] text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-green-500/20 shadow-lg"
-                                            : "bg-primary text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-primary/30 shadow-lg border-b-4 border-primary-dark/30"
+                                        : "bg-primary text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-primary/30 shadow-lg border-b-4 border-primary-dark/30"
                                 )}
                             >
-                                {deliveryMethod === 'pickup' ? (
-                                    <>
-                                        Pagar por WhatsApp
-                                        <MessageCircle className="w-6 h-6" />
-                                    </>
-                                ) : (
-                                    <>
-                                        Continuar
+                                        Confirmar Pedido
                                         <ArrowRight className="w-6 h-6" />
-                                    </>
-                                )}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Cross-selling Section (Full Width Bottom) */}
-            <div className="mt-16 pt-12 border-t border-slate-200">
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="p-2 bg-primary/10 rounded-xl">
-                            <ShoppingCart className="w-5 h-5 text-primary" />
-                        </div>
-                        <h2 className="text-2xl font-black text-background-dark tracking-tighter uppercase italic font-brand">Completa tu <span className="text-primary">Look</span></h2>
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                    {suggestedProducts.slice(0, 5).map(product => (
-                        <div
-                            key={product.id}
-                            onClick={() => openModal(product)}
-                            className="group bg-white p-4 rounded-[1.5rem] border border-transparent hover:border-primary/10 hover:shadow-[0_10px_30px_-15px_rgba(140,43,238,0.15)] transition-all cursor-pointer text-center"
-                        >
-                            <div className="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-slate-50">
-                                <Image src={product.image} fill className="object-cover group-hover:scale-110 transition-transform duration-700" alt={product.name} />
-                            </div>
-                            <h4 className="text-xs font-bold text-background-dark truncate leading-tight mb-1 group-hover:text-primary transition-colors">{product.name}</h4>
-                            <p className="text-sm font-black text-primary">${product.priceUSD}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
 
             <DeliveryModal
                 isOpen={isDeliveryModalOpen}
@@ -578,7 +628,9 @@ export default function Cart() {
                 onConfirm={(details) => {
                     setDeliveryDetails(details);
                     setIsDeliveryModalOpen(false);
-                    window.open(generateWhatsAppLink(details), '_blank');
+                    sendOrderNotification(details);
+                    setOrderComplete(true);
+                    clearCart();
                 }}
                 initialData={deliveryDetails}
             />
