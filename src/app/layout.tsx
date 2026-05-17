@@ -77,7 +77,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={cn(jakarta.variable, atlane.variable, "font-sans antialiased bg-background-light text-background-dark")}>
+      <body className={cn(jakarta.variable, atlane.variable, "font-sans antialiased bg-background-light text-background-dark overflow-x-hidden")}>
 
         {/* Global Background Pattern Overlay */}
         <div className="fixed inset-0 z-0 pointer-events-none">

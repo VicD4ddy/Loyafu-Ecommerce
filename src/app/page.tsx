@@ -175,7 +175,7 @@ export default async function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-background-dark">Confirma y Paga</h3>
                 <p className="text-slate-600 leading-relaxed text-sm">
-                  Te confirmaremos disponibilidad y total a pagar. Realiza tu pago (Pago Móvil, Zelle o Efectivo), envía el comprobante y ¡listo!
+                  Te confirmaremos disponibilidad y total a pagar. Realiza tu pago (Pago Móvil o Efectivo), envía el comprobante y ¡listo!
                 </p>
               </div>
             </div>

@@ -41,22 +41,45 @@ export default function SettingsPage() {
     };
 
     const handleUpdateChange = (key: string, newValue: string) => {
-        setSettings(prev => prev.map(s => s.key === key ? { ...s, value: newValue } : s));
+        setSettings(prev => {
+            const exists = prev.some(s => s.key === key);
+            if (exists) {
+                return prev.map(s => s.key === key ? { ...s, value: newValue } : s);
+            } else {
+                return [...prev, { key, value: newValue }];
+            }
+        });
     };
 
     const handleSave = async () => {
         setSaving(true);
         try {
             for (const setting of settings) {
-                const { error } = await supabase
+                // Check if setting exists first
+                const { data: existing } = await supabase
                     .from('site_settings')
-                    .update({
-                        value: setting.value,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('key', setting.key);
+                    .select('key')
+                    .eq('key', setting.key)
+                    .single();
 
-                if (error) throw error;
+                if (existing) {
+                    const { error } = await supabase
+                        .from('site_settings')
+                        .update({
+                            value: setting.value,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('key', setting.key);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase
+                        .from('site_settings')
+                        .insert({
+                            key: setting.key,
+                            value: setting.value
+                        });
+                    if (error) throw error;
+                }
             }
             showToast('¡Configuraciones guardadas!');
         } catch (error: any) {
@@ -79,6 +102,7 @@ export default function SettingsPage() {
     const whatsapp = settings.find(s => s.key === 'whatsapp_number');
     const storeName = settings.find(s => s.key === 'store_name');
     const deliveryMsg = settings.find(s => s.key === 'delivery_message');
+    const manualRate = settings.find(s => s.key === 'manual_bcv_rate');
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -136,6 +160,19 @@ export default function SettingsPage() {
                                 onChange={(e) => handleUpdateChange('store_name', e.target.value)}
                                 className="w-full bg-[#251e30] border border-white/5 text-white px-5 py-3 rounded-xl focus:outline-none focus:border-primary/50 transition-all font-bold"
                             />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-[#6d667c] uppercase tracking-widest pl-1">Tasa de Cambio BCV Manual</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={manualRate?.value || ''}
+                                onChange={(e) => handleUpdateChange('manual_bcv_rate', e.target.value)}
+                                placeholder="Ej: 36.50"
+                                className="w-full bg-[#251e30] border border-white/5 text-white px-5 py-3 rounded-xl focus:outline-none focus:border-primary/50 transition-all font-bold"
+                            />
+                            <p className="text-[10px] text-[#6d667c] pl-1 italic">Si se deja en blanco, se usará la tasa oficial automática.</p>
                         </div>
 
                         <div className="space-y-1.5">

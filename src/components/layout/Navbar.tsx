@@ -8,15 +8,19 @@ import { Menu, X, Search, ShoppingBag, ArrowRight, RefreshCw, Heart, Sparkles } 
 import { useCartStore } from '@/store/useCartStore';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { cn } from '@/lib/utils';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const setExchangeRate = useCartStore((state) => state.setExchangeRate);
+    const { getSetting } = useSettings();
     const [scrolled, setScrolled] = useState(false);
     const [cartAnimate, setCartAnimate] = useState(false);
     const [favAnimate, setFavAnimate] = useState(false);
     const [bcvRate, setBcvRate] = useState<number | null>(null);
+
+    const manualRate = getSetting('manual_bcv_rate');
 
     const cartItems = useCartStore((state) => state.items);
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -34,9 +38,18 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Fetch BCV Rate
+    // Fetch BCV Rate or use Manual Rate
     useEffect(() => {
         const fetchRate = async () => {
+            // Priority 1: Manual rate
+            if (manualRate && !isNaN(Number(manualRate)) && Number(manualRate) > 0) {
+                const numericRate = Number(manualRate);
+                setBcvRate(numericRate);
+                setExchangeRate(numericRate);
+                return;
+            }
+
+            // Priority 2: API
             try {
                 const res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial', {
                     next: { revalidate: 3600 }
@@ -54,7 +67,7 @@ export default function Navbar() {
             }
         };
         fetchRate();
-    }, [setExchangeRate]);
+    }, [setExchangeRate, manualRate]);
 
     // Cart Animation Trigger
     useEffect(() => {

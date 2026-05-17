@@ -440,28 +440,8 @@ export const PRODUCTS: Product[] = [
     },
 
     // --- Dolce Bella ---
-    {
-        id: 'dolce-1',
-        name: 'Polvo compacto sencillo Dolce Bella',
-        priceUSD: 3.50,
-        description: 'Mayor: $2.64 (a partir de 3 unidades). Tonos variados.',
-        category: 'Dolce Bella',
-        image: '/products/dolce-bella-polvo-sencillo-01.jpg',
-        images: ['/products/dolce-bella-polvo-sencillo-01.jpg', '/products/dolce-bella-polvo-sencillo-02.jpg'],
-        wholesalePrice: 2.64,
-        wholesaleMin: 3
-    },
-    {
-        id: 'dolce-2',
-        name: 'Polvo compacto con filtro solar Dolce Bella',
-        priceUSD: 3.50,
-        description: 'Mayor: $2.64 (a partir de 3 unidades).',
-        category: 'Dolce Bella',
-        image: '/products/dolce-bella-polvo-solar-01.jpg',
-        images: ['/products/dolce-bella-polvo-solar-01.jpg', '/products/dolce-bella-polvo-solar-02.png'],
-        wholesalePrice: 2.64,
-        wholesaleMin: 3
-    },
+
+
     {
         id: 'dolce-3',
         name: 'Corrector Barra Dolce Bella',
@@ -659,14 +639,7 @@ export const PRODUCTS: Product[] = [
         wholesalePrice: 1.68,
         wholesaleMin: 3
     },
-    {
-        id: 'ushas-7',
-        name: 'Mascarilla Carbón Ushas',
-        priceUSD: 3.80,
-        description: 'Precio único: $3.80.',
-        category: 'Ushas',
-        image: '/products/ushas-mascarilla-carbon.png',
-    },
+
 
     // --- Brochas ---
     // --- Brochas ---
@@ -786,13 +759,7 @@ export const PRODUCTS: Product[] = [
     },
 
     // --- Bolsas de boutique ---
-    {
-        id: 'bolsas-1',
-        name: 'Bolsas de boutique 15x23',
-        priceUSD: 1.00, // Estimated placeholder
-        category: 'Bolsas de boutique',
-        image: 'https://placehold.co/600x400.png?text=Bolsa+15x23',
-    },
+
     {
         id: 'bolsas-2',
         name: 'Bolsas de boutique 20x30',
