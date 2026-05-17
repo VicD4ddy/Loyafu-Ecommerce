@@ -9,10 +9,12 @@ import { useEffect, useState } from 'react';
 import { DeliveryModal } from '@/components/cart/DeliveryModal';
 import { DeliveryDetails } from '@/store/useCartStore';
 import { useSettings } from '@/context/SettingsContext';
+import { useProductModalStore } from '@/store/useProductModalStore';
 
 
 export default function Cart() {
     const { items, removeItem, updateQuantity, updateItemColor, getTotal, currency, exchangeRate, deliveryMethod, setDeliveryMethod, deliveryDetails, setDeliveryDetails, clearCart } = useCartStore();
+    const openModal = useProductModalStore((state) => state.openModal);
     const { getSetting } = useSettings();
     const [mounted, setMounted] = useState(false);
     const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
